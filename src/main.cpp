@@ -6,5 +6,7 @@ int main() {
 
     AppManager appManager_;
 
+    appManager_.Start_App();
+
     return 0;
 }

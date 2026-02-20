@@ -9,3 +9,9 @@ target_include_directories(hal_UV_Cam PUBLIC
                             ${EBUS_INCLUDE_DIR})
 
 target_link_directories(hal_UV_Cam PUBLIC ${EBUS_LIB_DIR})
+
+target_include_directories(AppManager PUBLIC 
+                            ${CMAKE_CURRENT_SOURCE_DIR}
+                            ${EBUS_INCLUDE_DIR})
+
+target_link_directories(AppManager PUBLIC ${EBUS_LIB_DIR})
