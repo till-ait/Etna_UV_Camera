@@ -5,7 +5,8 @@ target_include_directories(Etna_UV_Camera PRIVATE ${EBUS_INCLUDE_DIR})
 target_link_directories(Etna_UV_Camera PRIVATE ${EBUS_LIB_DIR})
 
 target_link_libraries(Etna_UV_Camera PRIVATE
-    hal_UV_Cam  
+    hal_UV_Cam 
+    AppManager 
     PvDevice64.lib
     PvStream64.lib
     PvBase64.lib
