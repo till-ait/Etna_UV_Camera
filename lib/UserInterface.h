@@ -19,10 +19,6 @@
 
 // TODO il faut que je fass la class ThreadSecureQueue; OutputPayload; InputPayload; 
 
-enum e_output_type {
-    IMAGE,
-    DISPLAYED_INFO
-};
 
 struct {
     e_output_type output_type;
@@ -40,7 +36,7 @@ public :
 
 protected :
     const AppManager *appManager_;
-    const ThreadSecureQueue *outputQueue<output_pakage>
+    const ThreadSecureQueue *outputQueue<OutputPackage>
 };
 
 #endif
