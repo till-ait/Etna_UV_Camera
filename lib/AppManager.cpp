@@ -1,7 +1,12 @@
 #include "AppManager.h"
+#include "UserInterface.h"
+#include "CmdUi.h"
 
 AppManager::AppManager() {
     std::cout << "App Manager created." << std::endl;
+    is_running = true;
+    // userInterface_ = CmdUi(this);
+    userInterface_ = std::make_unique<CmdUi>(this);
 }
 
 AppManager::~AppManager() {
@@ -10,6 +15,11 @@ AppManager::~AppManager() {
 
 bool AppManager::Start_App(void) {
     std::cout << "App Start ... " << std::endl;
+
+    std::thread UI_Thread([this]() { userInterface_->Update(); });
+
+    UI_Thread.join();
+
     return true;
 }
 
@@ -28,4 +38,14 @@ std::vector<std::string> AppManager::Get_Connected_Cameras(){
 
 void AppManager::Set_Connected_Cameras(const std::vector<std::string> _connected_Cameras) {
     this->connected_Cameras = _connected_Cameras;
+}
+
+
+bool AppManager::Get_Is_Running() const {
+    return is_running;
+}
+
+
+void AppManager::Set_Is_Running(bool value){
+    is_running = value;
 }

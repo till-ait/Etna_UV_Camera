@@ -3,8 +3,7 @@
 
 #include <vector>
 #include <string>
-#include "AppManager.h"
-#include "OutputPayload.h"
+#include "OutputPackage.h"
 #include "ThreadSecureQueue.h"
 
 // struct { // TODO : cette structur doit etre implementer dans camera et sont les information qui seront display 
@@ -15,28 +14,20 @@
 //     int fps;
 // }camera_data;
 
-
-
-// TODO il faut que je fass la class ThreadSecureQueue; OutputPayload; InputPayload; 
-
-
-struct {
-    e_output_type output_type;
-    OutputPayload output_payload;
-}output_pakage;
+class AppManager;
 
 class UserInterface {
 public :
-    UserInterface(const AppManager *_appManager_);
+    UserInterface(AppManager *_appManager_);
     virtual ~UserInterface() =default;
 
     virtual void Update() =0;
 
-    ThreadSecureQueue* GetOutputQueue(void);
+    ThreadSecureQueue<OutputPackage>* GetOutputQueue(void);
 
 protected :
-    const AppManager *appManager_;
-    const ThreadSecureQueue *outputQueue<OutputPackage>
+    AppManager *appManager_;
+    ThreadSecureQueue<OutputPackage> *outputQueue = nullptr;
 };
 
 #endif

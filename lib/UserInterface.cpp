@@ -1,8 +1,8 @@
-#include "UserInterface"
+#include "UserInterface.h"
 
-UserInterface::UserInterface(const AppManager* _appManager_) : appManager_(_appManager_)
+UserInterface::UserInterface(AppManager* _appManager_) : appManager_(_appManager_)
 {}
 
-UserInterface::ThreadSecureQueue* GetOutputQueue(void) {
+ThreadSecureQueue<OutputPackage>* UserInterface::GetOutputQueue(void) {
     return outputQueue;
 }
