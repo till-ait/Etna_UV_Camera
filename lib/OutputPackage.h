@@ -4,9 +4,11 @@
 
 class OutputPackage {
 public :
-    OutputPackage(const std::string source_name,
-                  const std::list<int>* _p_image_buffer,
-                  const int* _p_data_buffer);
+    OutputPackage(std::string _source_name,
+                  std::list<int>* _p_image_buffer,
+                  int* _p_data_buffer);
+    
+    OutputPackage();
 
     std::string Get_Source_Name();
     std::list<int>* Get_P_Image_Buffer();

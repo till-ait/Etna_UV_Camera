@@ -21,7 +21,8 @@ public :
     UserInterface(AppManager *_appManager_);
     virtual ~UserInterface() =default;
 
-    virtual void Update() =0;
+    virtual void Update_Output() =0;
+    virtual void Update_Input() =0;
 
     ThreadSecureQueue<OutputPackage>* GetOutputQueue(void);
 

@@ -6,6 +6,7 @@
 #include <string>
 #include <thread>
 #include <memory>
+#include <atomic>
 // #include "UserInterface.h"
 // #include "CmdUi.h"
 
@@ -30,7 +31,7 @@ public :
 private :
     std::vector<std::string> id_Cameras;       // TODO : switch type to PvString
     std::vector<std::string> connected_Cameras;  // TODO : switch type to *UvCamControler
-    bool is_running;
+    std::atomic<bool> is_running;
     std::unique_ptr<UserInterface> userInterface_;
 };
 

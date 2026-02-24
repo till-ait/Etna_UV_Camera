@@ -16,9 +16,11 @@ AppManager::~AppManager() {
 bool AppManager::Start_App(void) {
     std::cout << "App Start ... " << std::endl;
 
-    std::thread UI_Thread([this]() { userInterface_->Update(); });
+    std::thread UI_Output_Thread([this]() { userInterface_->Update_Output(); });
+    std::thread UI_Input_Thread([this]() { userInterface_->Update_Input(); });
 
-    UI_Thread.join();
+    UI_Output_Thread.join();
+    UI_Input_Thread.join();
 
     return true;
 }
