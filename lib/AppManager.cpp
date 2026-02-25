@@ -7,12 +7,12 @@ AppManager::AppManager() {
     std::cout << "App Manager created." << std::endl;
     is_running = true;
     userInterface_ = new CmdUi(this);
-    inputhandler_ = new InputHandler(this);
+    inputHandler_ = new InputHandler(this);
 }
 
 AppManager::~AppManager() {
     delete userInterface_;
-    delete inputhandler_;
+    delete inputHandler_;
     std::cout << "App Manager have been deleted." << std::endl;
 }
 
@@ -21,7 +21,7 @@ bool AppManager::Start_App(void) {
 
     std::thread UI_Output_Thread([this]() { userInterface_->Update_Output(); });
     std::thread UI_Input_Thread([this]() { userInterface_->Update_Input(); });
-    std::thread InputHandler_Thread([this]() { inputhandler_->Update(); });
+    std::thread InputHandler_Thread([this]() { inputHandler_->Update(); });
 
     UI_Output_Thread.join();
     UI_Input_Thread.join();
@@ -59,4 +59,8 @@ void AppManager::Set_Is_Running(bool value){
 
 UserInterface* AppManager::Get_UserInterface() {
     return userInterface_;
+}
+
+InputHandler* AppManager::Get_InputHandler() {
+    return inputHandler_;
 }

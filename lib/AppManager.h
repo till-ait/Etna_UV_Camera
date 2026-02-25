@@ -31,12 +31,14 @@ public :
 
     UserInterface* Get_UserInterface();
 
+    InputHandler* Get_InputHandler();
+
 private :
     std::vector<std::string> id_Cameras;       // TODO : switch type to PvString
     std::vector<std::string> connected_Cameras;  // TODO : switch type to *UvCamControler
     std::atomic<bool> is_running;
     UserInterface* userInterface_;
-    InputHandler* inputhandler_;
+    InputHandler* inputHandler_;
 };
 
 #endif
