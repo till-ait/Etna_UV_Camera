@@ -11,6 +11,20 @@ OutputPackage::OutputPackage(AppManager *_appManager_,
     appManager_->Get_UserInterface()->GetOutputQueue()->push(this);
 }
 
+// TODO : delet all the cout et iostream and use outputpackage
+OutputPackage::OutputPackage(AppManager *_appManager_, std::string* _display_msg)
+: OutputPackage(_appManager_, "", nullptr, nullptr, _display_msg)
+{}
+
+OutputPackage::OutputPackage(AppManager *_appManager_, std::string _source_name, std::list<int>* _p_image_buffer)
+: OutputPackage(_appManager_, _source_name, _p_image_buffer, nullptr, nullptr)
+{}
+
+OutputPackage::OutputPackage(AppManager *_appManager_, std::string _source_name, int* _p_data_buffer)
+: OutputPackage(_appManager_, _source_name, nullptr, _p_data_buffer, nullptr)
+{}
+
+
 OutputPackage::OutputPackage() 
 : appManager_(nullptr), source_name(""), p_image_buffer(nullptr), p_data_buffer(nullptr), display_msg(nullptr) {}
 

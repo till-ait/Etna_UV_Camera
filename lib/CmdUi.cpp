@@ -48,7 +48,8 @@ void CmdUi::Update_Input() {
         // std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
         std::getline(std::cin, user_input);
 
-        new OutputPackage(appManager_, "input", nullptr, new int(6), new std::string("My message"));
+        // new OutputPackage(appManager_, "input", nullptr, new int(6), new std::string("My message"));
+        new OutputPackage(appManager_, new std::string("test constructeur"));
         
         // outputQueue->push(generated_output);
 

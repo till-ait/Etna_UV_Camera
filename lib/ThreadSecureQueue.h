@@ -1,3 +1,6 @@
+#ifndef THREADSECUREQUEUE_H
+#define THREADSECUREQUEUE_H
+
 #include <queue>
 #include <mutex>
 #include <condition_variable>
@@ -51,3 +54,5 @@ private:
     std::condition_variable cv_;
     bool stopped_ = false;
 };
+
+#endif

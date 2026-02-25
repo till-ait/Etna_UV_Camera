@@ -1,4 +1,6 @@
-#pragma once 
+#ifndef CMDUI_H
+#define CMDUI_H
+
 #include "UserInterface.h"
 #include <string>
 
@@ -10,3 +12,5 @@ public:
     void Update_Output() override;
     void Update_Input() override;
 };
+
+#endif

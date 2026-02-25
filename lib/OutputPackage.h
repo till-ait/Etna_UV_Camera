@@ -1,4 +1,6 @@
-#pragma once
+#ifndef OUTPUTPACKAGE_H
+#define OUTPUTPACKAGE_H
+
 #include <string>
 #include <list>
 #include "AppManager.h"
@@ -10,6 +12,10 @@ public :
                   std::list<int>* _p_image_buffer,
                   int* _p_data_buffer,
                   std::string* _display_msg);
+
+    OutputPackage(AppManager *_appManager_, std::string* _display_msg);
+    OutputPackage(AppManager *_appManager_, std::string _source_name, std::list<int>* _p_image_buffer);
+    OutputPackage(AppManager *_appManager_, std::string _source_name, int* _p_data_buffer);
     
     OutputPackage();
     ~OutputPackage();
@@ -26,3 +32,5 @@ private:
     int *p_data_buffer;   // TODO : changer pour que ce soit 
     std::string* display_msg;
 };
+
+#endif
