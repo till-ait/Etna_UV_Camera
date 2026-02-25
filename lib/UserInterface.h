@@ -24,11 +24,11 @@ public :
     virtual void Update_Output() =0;
     virtual void Update_Input() =0;
 
-    ThreadSecureQueue<OutputPackage>* GetOutputQueue(void);
+    ThreadSecureQueue<OutputPackage*>* GetOutputQueue(void);
 
 protected :
     AppManager *appManager_;
-    ThreadSecureQueue<OutputPackage> *outputQueue = nullptr;
+    ThreadSecureQueue<OutputPackage*> *outputQueue = nullptr;
 };
 
 #endif

@@ -5,7 +5,7 @@
 
 void CmdUi::Update_Output() {
     std::string msg;
-    OutputPackage current_output;
+    OutputPackage *current_output;
     while(appManager_->Get_Is_Running()) {
         msg = "\rOutput Thread running ... Dislplay cameras datas";
         std::cout << msg << std::endl;
@@ -14,29 +14,28 @@ void CmdUi::Update_Output() {
         std::cout << "\n";
 
         // TODO : affiche l'image
-        if(current_output.Get_P_Image_Buffer() != nullptr) {
+        if(current_output->Get_P_Image_Buffer() != nullptr) {
             std::cout << "Display Image from " 
-            << current_output.Get_Source_Name() 
+            << current_output->Get_Source_Name() 
             << std::endl;
         }
 
         // TODO : faire en sorte qu'il affiche la structur des parametre de la cam ou spectro
-        if(current_output.Get_P_Data_Buffer() != nullptr) {
+        if(current_output->Get_P_Data_Buffer() != nullptr) {
             std::cout << "Data : " 
-            << *(current_output.Get_P_Data_Buffer()) 
-            << " from" << current_output.Get_Source_Name()
+            << *(current_output->Get_P_Data_Buffer()) 
+            << " from" << current_output->Get_Source_Name()
             << std::endl;
         }
 
-        if(current_output.Get_Display_Msg() != "") {
-            std::cout << current_output.Get_Display_Msg() << std::endl;
+        if(current_output->Get_Display_Msg() != nullptr) {
+            std::cout << *(current_output->Get_Display_Msg()) << std::endl;
         }
     }
     std::cout << "Input Thread closing ..." << std::endl;
 }
 
 void CmdUi::Update_Input() {
-    OutputPackage generated_output;
     std::string user_input;
     std::cout << "Input Thread running ..." << std::endl;
 
@@ -47,9 +46,9 @@ void CmdUi::Update_Input() {
         // std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
         std::getline(std::cin, user_input);
 
-        generated_output = OutputPackage("input", nullptr, new int(5), "My message");
+        OutputPackage(appManager_, "input", nullptr, new int(6), new std::string("My message"));
         
-        outputQueue->push(generated_output);
+        // outputQueue->push(generated_output);
 
         if(user_input == "stop") {
             appManager_->Set_Is_Running(false);

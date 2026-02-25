@@ -28,11 +28,13 @@ public :
     bool Get_Is_Running() const;
     void Set_Is_Running(bool value);
 
+    UserInterface* Get_UserInterface();
+
 private :
     std::vector<std::string> id_Cameras;       // TODO : switch type to PvString
     std::vector<std::string> connected_Cameras;  // TODO : switch type to *UvCamControler
     std::atomic<bool> is_running;
-    std::unique_ptr<UserInterface> userInterface_;
+    UserInterface* userInterface_;
 };
 
 #endif

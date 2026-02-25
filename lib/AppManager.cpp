@@ -6,7 +6,7 @@ AppManager::AppManager() {
     std::cout << "App Manager created." << std::endl;
     is_running = true;
     // userInterface_ = CmdUi(this);
-    userInterface_ = std::make_unique<CmdUi>(this);
+    userInterface_ = new CmdUi(this);
 }
 
 AppManager::~AppManager() {
@@ -50,4 +50,8 @@ bool AppManager::Get_Is_Running() const {
 
 void AppManager::Set_Is_Running(bool value){
     is_running = value;
+}
+
+UserInterface* AppManager::Get_UserInterface() {
+    return userInterface_;
 }
