@@ -27,6 +27,10 @@ void CmdUi::Update_Output() {
             << " from" << current_output.Get_Source_Name()
             << std::endl;
         }
+
+        if(current_output.Get_Display_Msg() != "") {
+            std::cout << current_output.Get_Display_Msg() << std::endl;
+        }
     }
     std::cout << "Input Thread closing ..." << std::endl;
 }
@@ -43,7 +47,7 @@ void CmdUi::Update_Input() {
         // std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
         std::getline(std::cin, user_input);
 
-        generated_output = OutputPackage("input", nullptr, new int(5));
+        generated_output = OutputPackage("input", nullptr, new int(5), "My message");
         
         outputQueue->push(generated_output);
 
