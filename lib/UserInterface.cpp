@@ -4,6 +4,10 @@ UserInterface::UserInterface(AppManager* _appManager_) : appManager_(_appManager
                             outputQueue(new ThreadSecureQueue<OutputPackage*>())
 {}
 
+UserInterface::~UserInterface() {
+    delete outputQueue;
+}
+
 ThreadSecureQueue<OutputPackage*>* UserInterface::GetOutputQueue(void) {
     return outputQueue;
 }

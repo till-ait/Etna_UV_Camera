@@ -1,15 +1,18 @@
 #include "AppManager.h"
 #include "UserInterface.h"
+#include "InputHandler.h"
 #include "CmdUi.h"
 
 AppManager::AppManager() {
     std::cout << "App Manager created." << std::endl;
     is_running = true;
-    // userInterface_ = CmdUi(this);
     userInterface_ = new CmdUi(this);
+    inputhandler_ = new InputHandler(this);
 }
 
 AppManager::~AppManager() {
+    delete userInterface_;
+    delete inputhandler_;
     std::cout << "App Manager have been deleted." << std::endl;
 }
 

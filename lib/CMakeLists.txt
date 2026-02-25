@@ -16,6 +16,9 @@ add_library(ThreadSecureQueue
 add_library(CmdUi
             CmdUi.cpp)
 
+add_library(InputHandler
+            InputHandler.cpp)
+
 target_include_directories(hal_UV_Cam PUBLIC 
                             ${CMAKE_CURRENT_SOURCE_DIR}
                             ${EBUS_INCLUDE_DIR})
@@ -38,4 +41,7 @@ target_include_directories(ThreadSecureQueue PUBLIC
                             ${CMAKE_CURRENT_SOURCE_DIR})
                             
 target_include_directories(CmdUi PUBLIC 
+                            ${CMAKE_CURRENT_SOURCE_DIR})
+                            
+target_include_directories(InputHandler PUBLIC 
                             ${CMAKE_CURRENT_SOURCE_DIR})

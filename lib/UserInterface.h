@@ -19,7 +19,7 @@ class AppManager;
 class UserInterface {
 public :
     UserInterface(AppManager *_appManager_);
-    virtual ~UserInterface() =default;
+    virtual ~UserInterface();
 
     virtual void Update_Output() =0;
     virtual void Update_Input() =0;

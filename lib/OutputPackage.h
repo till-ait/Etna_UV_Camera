@@ -12,6 +12,7 @@ public :
                   std::string* _display_msg);
     
     OutputPackage();
+    ~OutputPackage();
 
     std::string Get_Source_Name();
     std::list<int>* Get_P_Image_Buffer();

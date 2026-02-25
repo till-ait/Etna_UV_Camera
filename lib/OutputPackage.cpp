@@ -14,6 +14,12 @@ OutputPackage::OutputPackage(AppManager *_appManager_,
 OutputPackage::OutputPackage() 
 : appManager_(nullptr), source_name(""), p_image_buffer(nullptr), p_data_buffer(nullptr), display_msg(nullptr) {}
 
+OutputPackage::~OutputPackage() {
+    delete p_image_buffer;    // TODO : remplacer par PVbuffer
+    delete p_data_buffer;   // TODO : changer pour que ce soit 
+    delete display_msg;
+}
+
 std::string OutputPackage::Get_Source_Name(){
     return source_name;
 }

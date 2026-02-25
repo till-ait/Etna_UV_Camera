@@ -31,6 +31,8 @@ void CmdUi::Update_Output() {
         if(current_output->Get_Display_Msg() != nullptr) {
             std::cout << *(current_output->Get_Display_Msg()) << std::endl;
         }
+
+        delete current_output;
     }
     std::cout << "Input Thread closing ..." << std::endl;
 }
@@ -46,7 +48,7 @@ void CmdUi::Update_Input() {
         // std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
         std::getline(std::cin, user_input);
 
-        OutputPackage(appManager_, "input", nullptr, new int(6), new std::string("My message"));
+        new OutputPackage(appManager_, "input", nullptr, new int(6), new std::string("My message"));
         
         // outputQueue->push(generated_output);
 

@@ -11,6 +11,7 @@
 // #include "CmdUi.h"
 
 class UserInterface;
+class InputHandler;
 
 class AppManager {
 public :
@@ -35,6 +36,7 @@ private :
     std::vector<std::string> connected_Cameras;  // TODO : switch type to *UvCamControler
     std::atomic<bool> is_running;
     UserInterface* userInterface_;
+    InputHandler* inputhandler_;
 };
 
 #endif
