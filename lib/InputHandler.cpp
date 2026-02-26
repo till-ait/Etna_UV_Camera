@@ -27,6 +27,9 @@ void InputHandler::Update() {
         else if(split_input[0] == "set") {
             set_cmd(split_input);
         }
+        else if(split_input[0] == "unblock_getline") {
+            // do nothing
+        }
         else {
             default_cmd(split_input);
         }

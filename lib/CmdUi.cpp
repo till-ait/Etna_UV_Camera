@@ -1,4 +1,5 @@
 #include <iostream>
+#include <cstdio>
 #include "CmdUi.h"
 #include "AppManager.h"
 #include "OutputPackage.h"
@@ -34,6 +35,8 @@ void CmdUi::Update_Output() {
 
         delete current_output;
     }
+
+    Terminate_Inpute_Thread();
     std::cout << "Output Thread closing ..." << std::endl;
 }
 
@@ -48,4 +51,8 @@ void CmdUi::Update_Input() {
 
     }
     std::cout << "Input Thread closing ..." << std::endl;
+}
+
+void CmdUi::Terminate_Inpute_Thread() {
+    fwrite("unblock_getline\n", 1, 1, stdin);
 }
