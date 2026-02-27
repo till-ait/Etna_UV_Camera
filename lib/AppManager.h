@@ -4,6 +4,14 @@
 #include <iostream>
 #include <vector>
 #include <string>
+#include <thread>
+#include <memory>
+#include <atomic>
+// #include "UserInterface.h"
+// #include "CmdUi.h"
+
+class UserInterface;
+class InputHandler;
 
 class AppManager {
 public :
@@ -18,9 +26,19 @@ public :
     std::vector<std::string> Get_Connected_Cameras();
     void Set_Connected_Cameras(const std::vector<std::string> _connected_Cameras);
 
+    bool Get_Is_Running() const;
+    void Set_Is_Running(bool value);
+
+    UserInterface* Get_UserInterface();
+
+    InputHandler* Get_InputHandler();
+
 private :
     std::vector<std::string> id_Cameras;       // TODO : switch type to PvString
     std::vector<std::string> connected_Cameras;  // TODO : switch type to *UvCamControler
+    std::atomic<bool> is_running;
+    UserInterface* userInterface_;
+    InputHandler* inputHandler_;
 };
 
 #endif
