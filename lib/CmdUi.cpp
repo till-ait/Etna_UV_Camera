@@ -1,5 +1,6 @@
 #include <iostream>
 #include <cstdio>
+#include <semaphore>
 #include "CmdUi.h"
 #include "AppManager.h"
 #include "OutputPackage.h"
@@ -8,6 +9,9 @@
 void CmdUi::Update_Output() {
     std::string msg;
     OutputPackage *current_output;
+
+    std::cout << "Output Thread running ..." << std::flush;
+
     while(appManager_->Get_Is_Running()) {
         current_output = outputQueue->pop();
         
@@ -31,28 +35,27 @@ void CmdUi::Update_Output() {
         if(current_output->Get_Display_Msg() != nullptr) {
             std::cout << *(current_output->Get_Display_Msg()) << std::endl;
         }
-        std::cout << ">" << std::flush;
-
-        delete current_output;
+        
+        if(appManager_->Get_Is_Running()){
+            std::cout << ">" << std::flush;
+            delete current_output;
+        }
     }
-
-    Terminate_Inpute_Thread();
     std::cout << "Output Thread closing ..." << std::endl;
 }
 
 void CmdUi::Update_Input() {
     std::string user_input;
-    std::cout << "Input Thread running ..." << std::endl;
+    //std::cout << "Input Thread running ..." << std::endl;
+    new OutputPackage(appManager_, new std::string("Input Thread running ..."));
+    std::binary_semaphore& signal_Input_Handled = appManager_->Get_InputHandler()->Get_Input_Handled();
 
     while(appManager_->Get_Is_Running()) {
         std::getline(std::cin, user_input);
 
         appManager_->Get_InputHandler()->Get_InputQueue()->push(new std::string(user_input));
 
+        signal_Input_Handled.acquire();
     }
     std::cout << "Input Thread closing ..." << std::endl;
-}
-
-void CmdUi::Terminate_Inpute_Thread() {
-    fwrite("unblock_getline\n", 1, 1, stdin);
 }

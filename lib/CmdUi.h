@@ -11,8 +11,6 @@ public:
 
     void Update_Output() override;
     void Update_Input() override;
-private :
-    void Terminate_Inpute_Thread();
 };
 
 #endif
