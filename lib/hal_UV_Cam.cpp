@@ -1,14 +1,117 @@
 #include "hal_UV_Cam.h"
 
-
 PV_INIT_SIGNAL_HANDLER();
 
-int main_eBus(){
+// ---------------------------------------------------------------------------
+// Globals pour la fenetre GDI (partagee entre le thread camera et le thread UI)
+// ---------------------------------------------------------------------------
+HWND   g_hWnd      = NULL;
+HANDLE g_hWndReady = NULL;   // event signale quand la fenetre est prete
+
+// ---------------------------------------------------------------------------
+// Thread dedie a la fenetre Win32 (message loop obligatoire sous Windows)
+// ---------------------------------------------------------------------------
+DWORD WINAPI WindowThread( LPVOID lpParam )
+{
+    HINSTANCE hInst = GetModuleHandle( NULL );
+
+    // Enregistrer la classe de fenetre
+    WNDCLASS wc      = {};
+    wc.lpfnWndProc   = DefWindowProc;
+    wc.hInstance     = hInst;
+    wc.lpszClassName = TEXT( "UVCamWindow" );
+    wc.hbrBackground = (HBRUSH)GetStockObject( BLACK_BRUSH );
+    RegisterClass( &wc );
+
+    // Creer la fenetre
+    g_hWnd = CreateWindowEx(
+        0,
+        TEXT( "UVCamWindow" ),
+        TEXT( "UV Camera - Mono8" ),
+        WS_OVERLAPPEDWINDOW | WS_VISIBLE,
+        CW_USEDEFAULT, CW_USEDEFAULT,
+        800, 600,
+        NULL, NULL, hInst, NULL );
+
+    // Signaler que la fenetre est prete
+    SetEvent( g_hWndReady );
+
+    // Boucle de messages
+    MSG msg;
+    while ( GetMessage( &msg, NULL, 0, 0 ) )
+    {
+        TranslateMessage( &msg );
+        DispatchMessage( &msg );
+    }
+
+    return 0;
+}
+
+// ---------------------------------------------------------------------------
+// Affiche un buffer Mono8 dans la fenetre GDI via StretchDIBits
+// ---------------------------------------------------------------------------
+void DisplayMono8( uint8_t *aData, uint32_t aWidth, uint32_t aHeight )
+{
+    if ( g_hWnd == NULL || aData == NULL )
+        return;
+
+    // Construire un BITMAPINFO pour une image en niveaux de gris 8 bpp
+    // La palette de 256 entrees est placee juste apres le BITMAPINFOHEADER
+    struct
+    {
+        BITMAPINFOHEADER bmiHeader;
+        RGBQUAD          bmiColors[256];
+    } bmi = {};
+
+    bmi.bmiHeader.biSize        = sizeof( BITMAPINFOHEADER );
+    bmi.bmiHeader.biWidth       = static_cast<LONG>( aWidth );
+    bmi.bmiHeader.biHeight      = -static_cast<LONG>( aHeight ); // negatif = top-down
+    bmi.bmiHeader.biPlanes      = 1;
+    bmi.bmiHeader.biBitCount    = 8;
+    bmi.bmiHeader.biCompression = BI_RGB;
+
+    // Remplir la palette avec les 256 niveaux de gris
+    for ( int i = 0; i < 256; i++ )
+    {
+        bmi.bmiColors[i].rgbRed   = static_cast<BYTE>( i );
+        bmi.bmiColors[i].rgbGreen = static_cast<BYTE>( i );
+        bmi.bmiColors[i].rgbBlue  = static_cast<BYTE>( i );
+    }
+
+    // Recuperer les dimensions de la zone cliente
+    RECT rcClient;
+    GetClientRect( g_hWnd, &rcClient );
+    int destW = rcClient.right  - rcClient.left;
+    int destH = rcClient.bottom - rcClient.top;
+
+    HDC hdc = GetDC( g_hWnd );
+
+    // Dessiner l'image en l'etirant a la taille de la fenetre
+    StretchDIBits(
+        hdc,
+        0, 0, destW, destH,          // destination
+        0, 0, aWidth, aHeight,        // source
+        aData,
+        reinterpret_cast<BITMAPINFO *>( &bmi ),
+        DIB_RGB_COLORS,
+        SRCCOPY );
+
+    ReleaseDC( g_hWnd, hdc );
+}
+
+// ---------------------------------------------------------------------------
+
+int main_eBus()
+{
+    // Demarrer le thread de la fenetre avant la camera
+    g_hWndReady = CreateEvent( NULL, TRUE, FALSE, NULL );
+    HANDLE hThread = CreateThread( NULL, 0, WindowThread, NULL, 0, NULL );
+    WaitForSingleObject( g_hWndReady, INFINITE );   // attendre que la fenetre soit prete
+    CloseHandle( g_hWndReady );
+
     PvDevice *lDevice = NULL;
     PvStream *lStream = NULL;
     BufferList lBufferList;
-
-    // PV_SAMPLE_INIT();
 
     cout << "PvStreamSample:" << endl << endl;
 
@@ -25,48 +128,45 @@ int main_eBus(){
                 CreateStreamBuffers( lDevice, lStream, &lBufferList );
                 AcquireImages( lDevice, lStream );
                 FreeStreamBuffers( &lBufferList );
-                
-                // Close the stream
+
                 cout << "Closing stream" << endl;
                 lStream->Close();
-                PvStream::Free( lStream );    
+                PvStream::Free( lStream );
             }
 
-            // Disconnect the device
             cout << "Disconnecting device" << endl;
             lDevice->Disconnect();
             PvDevice::Free( lDevice );
         }
     }
 
-    cout << endl;
-    cout << "<press a key to exit>" << endl;
-    // PvWaitForKeyPress();
+    // Fermer la fenetre proprement
+    if ( g_hWnd )
+        PostMessage( g_hWnd, WM_CLOSE, 0, 0 );
+    WaitForSingleObject( hThread, 3000 );
+    CloseHandle( hThread );
 
-    // PV_SAMPLE_TERMINATE();
-
+    cout << endl << "<press a key to exit>" << endl;
     return 0;
 }
 
+// ---------------------------------------------------------------------------
 
 PvDevice *ConnectToDevice( const PvString &aConnectionID )
 {
     PvDevice *lDevice;
     PvResult lResult;
 
-    // Connect to the GigE Vision or USB3 Vision device
     cout << "Connecting to device." << endl;
     lDevice = PvDevice::CreateAndConnect( aConnectionID, &lResult );
     if ( lDevice == NULL )
     {
         cout << "Unable to connect to device: "
-        << lResult.GetCodeString().GetAscii()
-        << " ("
-        << lResult.GetDescription().GetAscii()
-        << ")" << endl;
+             << lResult.GetCodeString().GetAscii()
+             << " ("
+             << lResult.GetDescription().GetAscii()
+             << ")" << endl;
     }
-
- 
     return lDevice;
 }
 
@@ -75,62 +175,43 @@ PvStream *OpenStream( const PvString &aConnectionID )
     PvStream *lStream;
     PvResult lResult;
 
-    // Open stream to the GigE Vision or USB3 Vision device
     cout << "Opening stream from device." << endl;
     lStream = PvStream::CreateAndOpen( aConnectionID, &lResult );
     if ( lStream == NULL )
     {
         cout << "Unable to stream from device. "
-            << lResult.GetCodeString().GetAscii()
-            << " ("
-            << lResult.GetDescription().GetAscii()
-            << ")"
-            << endl;
+             << lResult.GetCodeString().GetAscii()
+             << " ("
+             << lResult.GetDescription().GetAscii()
+             << ")" << endl;
     }
-
     return lStream;
 }
 
 void ConfigureStream( PvDevice *aDevice, PvStream *aStream )
 {
-    // If this is a GigE Vision device, configure GigE Vision specific streaming parameters
-    PvDeviceGEV* lDeviceGEV = dynamic_cast<PvDeviceGEV *>( aDevice );
+    PvDeviceGEV *lDeviceGEV = dynamic_cast<PvDeviceGEV *>( aDevice );
     if ( lDeviceGEV != NULL )
     {
         PvStreamGEV *lStreamGEV = static_cast<PvStreamGEV *>( aStream );
-
-        // Negotiate packet size
         lDeviceGEV->NegotiatePacketSize();
-
-        // Configure device streaming destination
         lDeviceGEV->SetStreamDestination( lStreamGEV->GetLocalIPAddress(), lStreamGEV->GetLocalPort() );
     }
 }
 
 void CreateStreamBuffers( PvDevice *aDevice, PvStream *aStream, BufferList *aBufferList )
 {
-    // Reading payload size from device
     uint32_t lSize = aDevice->GetPayloadSize();
+    uint32_t lBufferCount = ( aStream->GetQueuedBufferMaximum() < BUFFER_COUNT ) ?
+        aStream->GetQueuedBufferMaximum() : BUFFER_COUNT;
 
-    // Use BUFFER_COUNT or the maximum number of buffers, whichever is smaller
-    uint32_t lBufferCount = ( aStream->GetQueuedBufferMaximum() < BUFFER_COUNT ) ? 
-        aStream->GetQueuedBufferMaximum() :
-        BUFFER_COUNT;
-
-    // Allocate buffers
     for ( uint32_t i = 0; i < lBufferCount; i++ )
     {
-        // Create new buffer object
         PvBuffer *lBuffer = new PvBuffer;
-
-        // Have the new buffer object allocate payload memory
         lBuffer->Alloc( static_cast<uint32_t>( lSize ) );
-        
-        // Add to external list - used to eventually release the buffers
         aBufferList->push_back( lBuffer );
     }
-    
-    // Queue all buffers in the stream
+
     BufferList::iterator lIt = aBufferList->begin();
     while ( lIt != aBufferList->end() )
     {
@@ -141,52 +222,54 @@ void CreateStreamBuffers( PvDevice *aDevice, PvStream *aStream, BufferList *aBuf
 
 void AcquireImages( PvDevice *aDevice, PvStream *aStream )
 {
-    // Get device parameters need to control streaming
     PvGenParameterArray *lDeviceParams = aDevice->GetParameters();
 
-    // Map the GenICam AcquisitionStart and AcquisitionStop commands
     PvGenCommand *lStart = dynamic_cast<PvGenCommand *>( lDeviceParams->Get( "AcquisitionStart" ) );
-    PvGenCommand *lStop = dynamic_cast<PvGenCommand *>( lDeviceParams->Get( "AcquisitionStop" ) );
+    PvGenCommand *lStop  = dynamic_cast<PvGenCommand *>( lDeviceParams->Get( "AcquisitionStop" ) );
 
-    // Get stream parameters
     PvGenParameterArray *lStreamParams = aStream->GetParameters();
-
-    // Map a few GenICam stream stats counters
     PvGenFloat *lFrameRate = dynamic_cast<PvGenFloat *>( lStreamParams->Get( "AcquisitionRate" ) );
     PvGenFloat *lBandwidth = dynamic_cast<PvGenFloat *>( lStreamParams->Get( "Bandwidth" ) );
 
-    // Enable streaming and send the AcquisitionStart command
     cout << "Enabling streaming and sending AcquisitionStart command." << endl;
     aDevice->StreamEnable();
     lStart->Execute();
 
     char lDoodle[] = "|\\-|-/";
-    int lDoodleIndex = 0;
+    int  lDoodleIndex = 0;
     double lFrameRateVal = 0.0;
     double lBandwidthVal = 0.0;
-    int lErrors = 0;
+    int    lErrors = 0;
+    bool   lRunning = true;
 
     PvDecompressionFilter lDecompressionFilter;
 
-    // Acquire images until the user instructs us to stop.
-    cout << endl << "<press a key to stop streaming>" << endl;
-    // while ( !PvKbHit() )
-    while ( true )
-    {
-        PvBuffer *lBuffer = NULL;
-        PvResult lOperationResult;
+    cout << endl << "<fermer la fenetre ou appuyer sur 'q' dans la console pour arreter>" << endl;
 
-        // Retrieve next buffer
+    while ( lRunning )
+    {
+        // Quitter si la fenetre a ete fermee
+        if ( g_hWnd && !IsWindow( g_hWnd ) )
+        {
+            lRunning = false;
+            break;
+        }
+
+        // Quitter si 'q' est appuye dans la console
+        if ( _kbhit() && _getch() == 'q' )
+        {
+            lRunning = false;
+            break;
+        }
+
+        PvBuffer *lBuffer = NULL;
+        PvResult  lOperationResult;
+
         PvResult lResult = aStream->RetrieveBuffer( &lBuffer, &lOperationResult, 1000 );
         if ( lResult.IsOK() )
         {
             if ( lOperationResult.IsOK() )
             {
-                //
-                // We now have a valid buffer. This is where you would typically process the buffer.
-                // -----------------------------------------------------------------------------------------
-                // ...
-
                 lFrameRate->GetValue( lFrameRateVal );
                 lBandwidth->GetValue( lBandwidthVal );
 
@@ -197,11 +280,21 @@ void AcquireImages( PvDevice *aDevice, PvStream *aStream )
                 switch ( lBuffer->GetPayloadType() )
                 {
                 case PvPayloadTypeImage:
-                    cout << "  W: " << dec << lBuffer->GetImage()->GetWidth() << " H: " << lBuffer->GetImage()->GetHeight();
+                    {
+                        PvImage  *lImage  = lBuffer->GetImage();
+                        uint32_t  lWidth  = lImage->GetWidth();
+                        uint32_t  lHeight = lImage->GetHeight();
+                        uint8_t  *lData   = lImage->GetDataPointer();
+
+                        // Affichage GDI natif - Mono8
+                        DisplayMono8( lData, lWidth, lHeight );
+
+                        cout << "  W: " << dec << lWidth << " H: " << lHeight;
+                    }
                     break;
 
                 case PvPayloadTypeChunkData:
-                    cout << " Chunk Data payload type" << " with " << lBuffer->GetChunkCount() << " chunks";
+                    cout << " Chunk Data payload type with " << lBuffer->GetChunkCount() << " chunks";
                     break;
 
                 case PvPayloadTypeRawData:
@@ -220,87 +313,70 @@ void AcquireImages( PvDevice *aDevice, PvStream *aStream )
                         uint32_t lCalculatedSize = PvImage::GetPixelSize( lPixelType ) * lWidth * lHeight / 8;
 
                         PvBuffer lDecompressedBuffer;
-                        // If the buffer is compressed, start by decompressing it
                         if ( lDecompressionFilter.IsCompressed( lBuffer ) )
                         {
                             lResult = lDecompressionFilter.Execute( lBuffer, &lDecompressedBuffer );
-                            if ( !lResult.IsOK() )
-                            {
-                                break;
-                            }
+                            if ( !lResult.IsOK() ) break;
                         }
 
                         uint32_t lDecompressedSize = lDecompressedBuffer.GetSize();
-                        if ( lDecompressedSize!= lCalculatedSize )
-                        {
-                            lErrors++;
-                        }
-                        double lCompressionRatio = static_cast<double>( lDecompressedSize ) / static_cast<double>( lBuffer->GetAcquiredSize() );
-                        cout << dec << " Pleora compressed type.   Compression ratio: " << lCompressionRatio;
-                        cout << " Errors: " << lErrors;
-                        cout << " W: " << dec << lWidth << " H: " << lHeight;
+                        if ( lDecompressedSize != lCalculatedSize ) lErrors++;
+
+                        double lCompressionRatio = static_cast<double>( lDecompressedSize ) /
+                                                   static_cast<double>( lBuffer->GetAcquiredSize() );
+                        cout << dec << " Pleora compressed. Ratio: " << lCompressionRatio
+                             << " Errors: " << lErrors
+                             << " W: " << lWidth << " H: " << lHeight;
                     }
                     break;
 
                 default:
-                    cout << " Payload type not supported by this sample";
+                    cout << " Payload type not supported";
                     break;
                 }
+
                 cout << "  " << lFrameRateVal << " FPS  " << ( lBandwidthVal / 1000000.0 ) << " Mb/s   \r";
             }
             else
             {
-                // Non OK operational result
                 cout << lDoodle[ lDoodleIndex ] << " " << lOperationResult.GetCodeString().GetAscii() << "\r";
             }
 
-            // Re-queue the buffer in the stream object
             aStream->QueueBuffer( lBuffer );
         }
         else
         {
-            // Retrieve buffer failure
             cout << lDoodle[ lDoodleIndex ] << " " << lResult.GetCodeString().GetAscii() << "\r";
         }
 
         ++lDoodleIndex %= 6;
     }
 
-    PvGetChar(); // Flush key buffer for next stop.
     cout << endl << endl;
 
-    // Tell the device to stop sending images.
     cout << "Sending AcquisitionStop command to the device" << endl;
     lStop->Execute();
 
-    // Disable streaming on the device
     cout << "Disable streaming on the controller." << endl;
     aDevice->StreamDisable();
 
-    // Abort all buffers from the stream and dequeue
     cout << "Aborting buffers still in stream" << endl;
     aStream->AbortQueuedBuffers();
     while ( aStream->GetQueuedBufferCount() > 0 )
     {
         PvBuffer *lBuffer = NULL;
-        PvResult lOperationResult;
-
+        PvResult  lOperationResult;
         aStream->RetrieveBuffer( &lBuffer, &lOperationResult );
     }
 }
 
 void FreeStreamBuffers( BufferList *aBufferList )
 {
-    // Go through the buffer list
     BufferList::iterator lIt = aBufferList->begin();
     while ( lIt != aBufferList->end() )
     {
         delete *lIt;
         lIt++;
     }
-
-    // Clear the buffer list 
     aBufferList->clear();
 }
-
-

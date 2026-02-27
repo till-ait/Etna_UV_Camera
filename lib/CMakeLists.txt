@@ -19,6 +19,12 @@ add_library(CmdUi
 add_library(InputHandler
             InputHandler.cpp)
 
+add_library(UvcamDisplay
+            UvcamDisplay.cpp)
+
+add_library(hal_UV_Cam2
+            hal_UV_Cam2.cpp)
+
 target_include_directories(hal_UV_Cam PUBLIC 
                             ${CMAKE_CURRENT_SOURCE_DIR}
                             ${EBUS_INCLUDE_DIR})
@@ -45,3 +51,12 @@ target_include_directories(CmdUi PUBLIC
                             
 target_include_directories(InputHandler PUBLIC 
                             ${CMAKE_CURRENT_SOURCE_DIR})
+                            
+target_include_directories(UvcamDisplay PUBLIC 
+                            ${CMAKE_CURRENT_SOURCE_DIR})
+                            
+target_include_directories(hal_UV_Cam2 PUBLIC 
+                            ${CMAKE_CURRENT_SOURCE_DIR}
+                            ${EBUS_INCLUDE_DIR})
+
+target_link_directories(hal_UV_Cam2 PUBLIC ${EBUS_LIB_DIR})
