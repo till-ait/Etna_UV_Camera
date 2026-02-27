@@ -23,6 +23,9 @@ void InputHandler::Update() {
         else if(split_input[0] == "set") {
             set_cmd(split_input);
         }
+        else if(split_input[0] == "help") {
+            help_cmd();
+        }
         else if(split_input[0] == "unblock_getline") {
             // do nothing
         }
@@ -47,12 +50,22 @@ std::vector<std::string> InputHandler::split(const std::string& str) {
 }
 
 void InputHandler::exit_cmd(){
-    new OutputPackage(appManager_, new std::string("Terminate output Thread"));
+    new OutputPackage(appManager_, new std::string("Terminate Threads... "));
     appManager_->Set_Is_Running(false);
 }
 
 void InputHandler::set_cmd(const std::vector<std::string>& split_input){
     // TODO : Implement la logique
+}
+
+void InputHandler::help_cmd() {
+    std::string msg = "Commande list : \n";
+
+    msg += " - exit : exit programme.\n";
+    msg += " - set target args value : set target's argument value.\n";
+    msg += " - help : print commands.\n";
+
+    new OutputPackage(appManager_, new std::string(msg));
 }
 
 void InputHandler::default_cmd(const std::vector<std::string>& split_input) {
