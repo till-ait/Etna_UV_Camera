@@ -25,6 +25,9 @@ add_library(UvcamDisplay
 add_library(hal_UV_Cam2
             hal_UV_Cam2.cpp)
 
+add_library(CameraControler
+            CameraControler.cpp)
+
 target_include_directories(hal_UV_Cam PUBLIC 
                             ${CMAKE_CURRENT_SOURCE_DIR}
                             ${EBUS_INCLUDE_DIR})
@@ -60,3 +63,9 @@ target_include_directories(hal_UV_Cam2 PUBLIC
                             ${EBUS_INCLUDE_DIR})
 
 target_link_directories(hal_UV_Cam2 PUBLIC ${EBUS_LIB_DIR})
+                            
+target_include_directories(CameraControler PUBLIC 
+                            ${CMAKE_CURRENT_SOURCE_DIR}
+                            ${EBUS_INCLUDE_DIR})
+
+target_link_directories(CameraControler PUBLIC ${EBUS_LIB_DIR})

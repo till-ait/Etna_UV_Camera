@@ -8,6 +8,7 @@ AppManager::AppManager() {
     is_running = true;
     userInterface_ = new CmdUi(this);
     inputHandler_ = new InputHandler(this);
+
 }
 
 AppManager::~AppManager() {
@@ -22,6 +23,8 @@ bool AppManager::Start_App(void) {
     std::thread UI_Output_Thread([this]() { userInterface_->Update_Output(); });
     std::thread UI_Input_Thread([this]() { userInterface_->Update_Input(); });
     std::thread InputHandler_Thread([this]() { inputHandler_->Update(); });
+
+    Cameras->push_back(new CameraControler(this));
 
     UI_Output_Thread.join();
     UI_Input_Thread.join();
@@ -39,13 +42,13 @@ void AppManager::Set_id_Cameras(const std::vector<std::string> _id_Cameras) {
 }
 
 
-std::vector<std::string> AppManager::Get_Connected_Cameras(){
-    return this->connected_Cameras; 
+std::vector<CameraControler*>* AppManager::Get_Cameras(){
+    return this->Cameras; 
 }
 
-void AppManager::Set_Connected_Cameras(const std::vector<std::string> _connected_Cameras) {
-    this->connected_Cameras = _connected_Cameras;
-}
+// void AppManager::Set_Connected_Cameras(const std::vector<std::string> _connected_Cameras) {
+//     this->connected_Cameras = _connected_Cameras;
+// }
 
 
 bool AppManager::Get_Is_Running() const {

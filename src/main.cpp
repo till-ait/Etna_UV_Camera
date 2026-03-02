@@ -8,8 +8,8 @@ int main() {
 
     AppManager appManager_;
 
-    // appManager_.Start_App();
-    main_eBus2();
+    appManager_.Start_App();
+    // main_eBus2();
 
     return 0;
 }
