@@ -75,7 +75,7 @@ void InputHandler::connect_cmd(const std::vector<std::string>& split_input){
                 return;
             }
 
-            cameras->at(i)->Acquire_Images();
+            cameras->at(i)->start_Acquire();
         }
     }
 

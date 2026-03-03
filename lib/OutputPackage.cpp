@@ -9,9 +9,17 @@ OutputPackage::OutputPackage(AppManager *_appManager_,
                 int* _p_data_buffer,
                 std::string* _display_msg)
 : appManager_(_appManager_), source_name(_source_name), 
-p_image_buffer(_p_image_buffer), width(_width), height(_height),
+width(_width), height(_height),
 p_data_buffer(_p_data_buffer),display_msg(_display_msg) 
 {
+    if (_p_image_buffer != nullptr && _width > 0 && _height > 0) {
+        uint32_t size = _width * _height; // Mono8 : 1 octet/pixel
+        p_image_buffer = new uint8_t[size];
+        memcpy(p_image_buffer, _p_image_buffer, size);
+    } else {
+        p_image_buffer = nullptr;
+    }
+
     appManager_->Get_UserInterface()->GetOutputQueue()->push(this);
 }
 

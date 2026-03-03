@@ -11,6 +11,7 @@
 #include <iomanip>
 #include <vector>
 #include <list>
+#include <thread>
 
 
 #define DEFAULT_FPS 16
@@ -40,6 +41,7 @@ public :
                     std::string name,
                     std::string id);
     CameraControler(AppManager* _appManager_);
+    ~CameraControler();
 
     s_camera_data Get_Data();
     void Set_Is_Connected(bool new_state);
@@ -48,6 +50,9 @@ public :
 
     bool Try_Connection();
     void Acquire_Images();
+
+    void start_Acquire();
+    void stop_Acquire();
     
 private :
     AppManager* appManager_;
@@ -58,6 +63,7 @@ private :
     PvDeviceGEV* device_GEV;
     PvStreamGEV* stream_GEV;
     std::list<PvBuffer *>* buffer_list;
+    std::thread* thread_acquire;
 
     void Create_Stream_Buffers();
     void Free_Stream_Buffers();

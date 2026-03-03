@@ -45,6 +45,10 @@ bool AppManager::Start_App(void) {
     UI_Output_Thread.join();
     UI_Input_Thread.join();
     InputHandler_Thread.join();
+    for (CameraControler* cam : *Cameras)
+    {
+        cam->stop_Acquire();
+    }
 
     return true;
 }

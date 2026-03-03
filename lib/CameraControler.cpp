@@ -29,11 +29,18 @@ CameraControler::CameraControler(AppManager* _appManager_, std::string name, std
 
     pv_result = new PvResult();
     buffer_list = new std::list<PvBuffer *>();
+    thread_acquire = NULL;
 }
 
 CameraControler::CameraControler(AppManager* _appManager_)
 : CameraControler(_appManager_, "Default_name", "0.0.0.0")
 {}
+
+CameraControler::~CameraControler(){
+    delete pv_result;
+    delete buffer_list;
+    delete thread_acquire;
+}
 
 s_camera_data CameraControler::Get_Data() {
     return data;
@@ -140,8 +147,6 @@ void CameraControler::Free_Stream_Buffers()
 void CameraControler::Acquire_Images() {
     Create_Stream_Buffers();
 
-    std::cout << "START ACQUIRING IMAGE" << std::endl;
-
     // Get device parameters need to control streaming
     PvGenParameterArray *lDeviceParams = device->GetParameters();
 
@@ -178,7 +183,7 @@ void CameraControler::Acquire_Images() {
 
     data.is_streaming = true;
 
-    while ( appManager_->Get_Is_Running() )
+    while ((appManager_->Get_Is_Running()) || (data.is_streaming))
     {
         PvBuffer *lBuffer = NULL;
         PvResult lOperationResult;
@@ -209,12 +214,9 @@ void CameraControler::Acquire_Images() {
                         uint8_t *data   = lBuffer->GetImage()->GetDataPointer();
                         uint32_t width  = lBuffer->GetImage()->GetWidth();
                         uint32_t height = lBuffer->GetImage()->GetHeight();
-                        std::cout << "IMAGE RECIVED" << std::endl;
-                        // cam1.PushFrame( lData, lWidth, lHeight );
-                        new OutputPackage(appManager_, new std::string("Cam1"), data, width, height);
-                        
-                        // cout << "  W: " << dec << lBuffer->GetImage()->GetWidth() << " H: " << lBuffer->GetImage()->GetHeight();
-                        // if ( !cam1.IsOpen() ) lRunning = false;
+
+                        // new OutputPackage(appManager_, new std::string("IMAGE RECIVED"));
+                        new OutputPackage(appManager_, new std::string(this->data.name), data, width, height);
                     }
                     break;
 
@@ -287,8 +289,8 @@ void CameraControler::Acquire_Images() {
     
     // cam1.Close();
 
-    PvGetChar(); // Flush key buffer for next stop.
-    cout << endl << endl;
+    // PvGetChar(); // Flush key buffer for next stop.
+    // cout << endl << endl;
 
     // Tell the device to stop sending images.
     // cout << "Sending AcquisitionStop command to the device" << endl;
@@ -311,4 +313,15 @@ void CameraControler::Acquire_Images() {
 
 
     Free_Stream_Buffers();
+}
+
+void CameraControler::start_Acquire() {
+    thread_acquire = new std::thread([this]() { Acquire_Images(); });
+}
+
+void CameraControler::stop_Acquire() {
+    data.is_streaming = false;
+    if(thread_acquire != NULL){
+        thread_acquire->join();
+    }
 }
