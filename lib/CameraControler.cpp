@@ -87,6 +87,7 @@ bool CameraControler::Try_Connection() {
     // Configure device streaming destination
     device_GEV->SetStreamDestination( stream_GEV->GetLocalIPAddress(), stream_GEV->GetLocalPort() );
     
+    data.is_connected = true;
     return result;
 }
 
@@ -174,6 +175,8 @@ void CameraControler::Acquire_Images() {
 
     // UVCamDisplay cam1("Camera UV 1");
     // cam1.Open(1280, 1024);
+
+    data.is_streaming = true;
 
     while ( appManager_->Get_Is_Running() )
     {

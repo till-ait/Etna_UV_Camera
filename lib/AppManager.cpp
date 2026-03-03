@@ -34,24 +34,19 @@ bool AppManager::Start_App(void) {
     std::thread UI_Input_Thread([this]() { userInterface_->Update_Input(); });
     std::thread InputHandler_Thread([this]() { inputHandler_->Update(); });
 
-    Cameras->push_back(new CameraControler((this), "cam1", "169.254.1.222"));
-    Cameras->at(0)->Try_Connection();
-    // Cameras->at(0)->Acquire_Images();
-    std::thread InputHandler_Thread([this]() { Cameras->at(0)->Acquire_Images(); });
+    Cameras->push_back(new CameraControler((this), "cam330", "169.254.1.222"));
+    Cameras->push_back(new CameraControler((this), "cam310", "169.254.1.248"));
+    // if(Cameras->at(0)->Try_Connection()){
+    //     // Cameras->at(0)->Acquire_Images();
+    //     std::thread Camera1_Thread([this]() { Cameras->at(0)->Acquire_Images(); });
+    //     Camera1_Thread.join();
+    // }
 
     UI_Output_Thread.join();
     UI_Input_Thread.join();
     InputHandler_Thread.join();
 
     return true;
-}
-
-std::vector<std::string> AppManager::Get_id_Cameras(){
-    return this->id_Cameras;
-}
-
-void AppManager::Set_id_Cameras(const std::vector<std::string> _id_Cameras) {
-    this->id_Cameras = _id_Cameras;
 }
 
 
