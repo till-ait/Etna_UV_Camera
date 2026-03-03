@@ -5,12 +5,16 @@
 #include "AppManager.h"
 #include "OutputPackage.h"
 #include "InputHandler.h"
+#include "UVCamDisplay.h"
 
 void CmdUi::Update_Output() {
     std::string msg;
     OutputPackage *current_output;
 
     std::cout << "Output Thread running ..." << std::flush;
+
+    UVCamDisplay cam1("Camera UV 1");
+    cam1.Open(1280, 1024);
 
     while(appManager_->Get_Is_Running()) {
         current_output = outputQueue->pop();
@@ -20,15 +24,21 @@ void CmdUi::Update_Output() {
         // TODO : affiche l'image
         if(current_output->Get_P_Image_Buffer() != nullptr) {
             std::cout << "Display Image from " 
-            << current_output->Get_Source_Name() 
+            << *(current_output->Get_Source_Name()) 
             << std::endl;
+
+            uint8_t *data   = current_output->Get_P_Image_Buffer();
+            uint32_t width  = current_output->Get_Width();
+            uint32_t height = current_output->Get_Height();
+            
+            cam1.PushFrame(data, width, height);
         }
 
         // TODO : faire en sorte qu'il affiche la structur des parametre de la cam ou spectro
         if(current_output->Get_P_Data_Buffer() != nullptr) {
             std::cout << "Data : " 
             << *(current_output->Get_P_Data_Buffer()) 
-            << " from" << current_output->Get_Source_Name()
+            << " from" << *(current_output->Get_Source_Name())
             << std::endl;
         }
 
@@ -41,6 +51,8 @@ void CmdUi::Update_Output() {
             delete current_output;
         }
     }
+    cam1.Close();
+
     std::cout << "Output Thread closing ..." << std::endl;
 }
 

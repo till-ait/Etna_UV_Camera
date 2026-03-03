@@ -9,10 +9,10 @@
 #include <atomic>
 // #include "UserInterface.h"
 // #include "CmdUi.h"
-#include "CameraControler.h"
 
 class UserInterface;
 class InputHandler;
+class CameraControler;
 
 class AppManager {
 public :
