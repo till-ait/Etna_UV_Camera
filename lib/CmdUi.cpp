@@ -15,17 +15,17 @@ void CmdUi::Update_Output() {
     std::cout << "Output Thread running ..." << std::flush;
 
     // TODO : faire en sorte qu'il cree autant de fenetre que de cam et verif avec GetTitle
-    UVCamDisplay cam330("Cam330");
-    cam330.Open(1280, 1024);
-    UVCamDisplay cam310("Cam310");
-    cam310.Open(1280, 1024);
+    // UVCamDisplay cam330("Cam330");
+    // cam330.Open(1280, 1024);
+    // UVCamDisplay cam310("Cam310");
+    // cam310.Open(1280, 1024);
 
     std::vector<UVCamDisplay*> cam_windows;
 
     for (CameraControler* cam : *(appManager_->Get_Cameras()))
     {
         cam_windows.push_back(new UVCamDisplay(cam->Get_Data().name));
-        cam_windows.back()->Open();
+        cam_windows.back()->Open(500, 500);
     }
 
     while(appManager_->Get_Is_Running()) {
