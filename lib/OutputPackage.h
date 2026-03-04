@@ -35,7 +35,7 @@ private:
     uint8_t* p_image_buffer;
     uint32_t width;
     uint32_t height;
-    int *p_data_buffer;   // TODO : changer pour que ce soit 
+    int *p_data_buffer;   // TODO : changer pour que ce soit les datas
     std::string* display_msg;
 };
 

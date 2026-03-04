@@ -24,7 +24,7 @@ void CmdUi::Update_Output() {
 
     while(appManager_->Get_Is_Running()) {
         current_output = outputQueue->pop();
-        
+
         // If too many image in the queue skip
         if((current_output->Get_P_Image_Buffer() != nullptr)
             && (outputQueue->size() < 10)) {
@@ -71,7 +71,7 @@ void CmdUi::Update_Output() {
 
 void CmdUi::Update_Input() {
     std::string user_input;
-    //std::cout << "Input Thread running ..." << std::endl;
+    
     new OutputPackage(appManager_, new std::string("Input Thread running ..."));
     std::binary_semaphore& signal_Input_Handled = appManager_->Get_InputHandler()->Get_Input_Handled();
 

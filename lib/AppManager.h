@@ -18,15 +18,10 @@ class AppManager {
 public :
     AppManager();
     ~AppManager();
-
-    // const std::string id_camera_330 = "169.254.1.222";
-    // const std::string id_camera_310 = "169.254.1.248";
     
-    bool Start_App(void);   // TODO : creat interface and inputhandler threads
+    bool Start_App(void);
 
-    
     std::vector<CameraControler*>* Get_Cameras();
-    // void Set_Cameras(const std::vector<std::string> _Cameras);
 
     bool Get_Is_Running() const;
     void Set_Is_Running(bool value);
@@ -36,8 +31,7 @@ public :
     InputHandler* Get_InputHandler();
 
 private :
-    // std::vector<s_camera_id> cameras_ids;       // TODO : switch type to PvString
-    std::vector<CameraControler*>* Cameras;  // TODO : switch type to *UvCamControler
+    std::vector<CameraControler*>* Cameras;
     std::atomic<bool> is_running;
     UserInterface* userInterface_;
     InputHandler* inputHandler_;

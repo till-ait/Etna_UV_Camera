@@ -23,7 +23,7 @@ p_data_buffer(_p_data_buffer),display_msg(_display_msg)
     appManager_->Get_UserInterface()->GetOutputQueue()->push(this);
 }
 
-// TODO : delet all the cout et iostream and use outputpackage
+
 OutputPackage::OutputPackage(AppManager *_appManager_, std::string* _display_msg)
 : OutputPackage(_appManager_, new std::string(""), nullptr, 0, 0, nullptr, _display_msg)
 {}
@@ -43,8 +43,8 @@ OutputPackage::OutputPackage()
 
 OutputPackage::~OutputPackage() {
     delete source_name;
-    delete p_image_buffer;    // TODO : remplacer par PVbuffer
-    delete p_data_buffer;   // TODO : changer pour que ce soit 
+    delete p_image_buffer;
+    delete p_data_buffer;
     delete display_msg;
 }
 

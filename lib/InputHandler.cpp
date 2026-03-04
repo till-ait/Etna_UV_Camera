@@ -67,10 +67,9 @@ void InputHandler::exit_cmd(){
 void InputHandler::connect_cmd(const std::vector<std::string>& split_input){
     bool result = false;
     std::string camera_id;
-    // std::vector<s_camera_id>& cameras_ids = appManager_.Get_id_Cameras();
+    
     std::vector<CameraControler*>* cameras = appManager_->Get_Cameras();
 
-    // TODO : est ce que le thread est garder en interne a la class ? comment join
     for(int i=0; i<cameras->size(); i++) {
         if(cameras->at(i)->Get_Data().name == split_input[1]) {
             result = cameras->at(i)->Try_Connection();
@@ -113,12 +112,6 @@ void InputHandler::set_cmd(const std::vector<std::string>& split_input){
             new OutputPackage(appManager_, new std::string("Err : value must be an int."));
         }
     }
-    // else if(split_input[0] == "connect") {
-    //     connect_cmd(split_input);
-    // }
-    // else if(split_input[0] == "set") {
-    //     set_cmd(split_input);
-    // }
 }
 
 void InputHandler::help_cmd() {

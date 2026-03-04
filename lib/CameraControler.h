@@ -6,7 +6,6 @@
 
 #include <stdio.h>
 #include <string>
-// #include <iostream>
 #include <sstream>
 #include <iomanip>
 #include <vector>
@@ -72,6 +71,7 @@ private :
     void Acquire_Images();
     void Acquire_Images2();
     void Send_Fps();
+    void Print_Param();
 };
 
 #endif

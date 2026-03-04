@@ -34,13 +34,9 @@ bool AppManager::Start_App(void) {
     std::thread UI_Input_Thread([this]() { userInterface_->Update_Input(); });
     std::thread InputHandler_Thread([this]() { inputHandler_->Update(); });
 
+    // TODO : utiliser un fichier de configuration pour ne pas avoir a reconfig a chaque fois
     Cameras->push_back(new CameraControler((this), "cam330", "169.254.1.222"));
     Cameras->push_back(new CameraControler((this), "cam310", "169.254.1.248"));
-    // if(Cameras->at(0)->Try_Connection()){
-    //     // Cameras->at(0)->Acquire_Images();
-    //     std::thread Camera1_Thread([this]() { Cameras->at(0)->Acquire_Images(); });
-    //     Camera1_Thread.join();
-    // }
 
     UI_Output_Thread.join();
     UI_Input_Thread.join();
@@ -58,9 +54,6 @@ std::vector<CameraControler*>* AppManager::Get_Cameras(){
     return this->Cameras; 
 }
 
-// void AppManager::Set_Connected_Cameras(const std::vector<std::string> _connected_Cameras) {
-//     this->connected_Cameras = _connected_Cameras;
-// }
 
 
 bool AppManager::Get_Is_Running() const {

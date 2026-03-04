@@ -361,22 +361,10 @@ void CameraControler::Acquire_Images2() {
         // ++lDoodleIndex %= 6;
     }
 
-    
-    // cam1.Close();
-
-    // PvGetChar(); // Flush key buffer for next stop.
-    // cout << endl << endl;
-
-    // Tell the device to stop sending images.
-    // cout << "Sending AcquisitionStop command to the device" << endl;
     lStop->Execute();
 
-    // Disable streaming on the device
-    // cout << "Disable streaming on the controller." << endl;
     device->StreamDisable();
 
-    // Abort all buffers from the stream and dequeue
-    // cout << "Aborting buffers still in stream" << endl;
     stream->AbortQueuedBuffers();
     while ( stream->GetQueuedBufferCount() > 0 )
     {
@@ -385,7 +373,6 @@ void CameraControler::Acquire_Images2() {
 
         stream->RetrieveBuffer( &lBuffer, &lOperationResult );
     }
-
 
     Free_Stream_Buffers();
 }
@@ -425,9 +412,30 @@ void CameraControler::Send_Fps() {
         params->Get("AcquisitionFrameRateEnable")
     );
     if (lEnable) lEnable->SetValue(true);
+    
+    PvGenBoolean *lEnableMax = dynamic_cast<PvGenBoolean *>(
+        params->Get("MaxAcquisitionFrameRateEnable")
+    );
+    if (lEnableMax) lEnableMax->SetValue(true);
 
     PvGenFloat *lFPS = dynamic_cast<PvGenFloat *>(
-        params->Get("AcquisitionFrameRate")
+        params->Get("JAIAcquisitionFrameRate")
     );
     if (lFPS) lFPS->SetValue((double)data.fps);
+}
+
+void CameraControler::Print_Param() {
+    PvGenParameterArray *params = device->GetParameters();
+    uint32_t count = params->GetCount();
+
+    for (uint32_t i = 0; i < count; i++) {
+        PvGenParameter *param = params->Get(i);
+        
+        PvString name;
+        param->GetName(name);
+        
+        PvString type;
+        // afficher nom et type
+        std::cout << name.GetAscii() << std::endl;
+    }
 }
