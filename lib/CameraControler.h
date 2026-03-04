@@ -49,10 +49,12 @@ public :
     void Set_Is_Recording(bool new_state);
 
     bool Try_Connection();
-    void Acquire_Images();
-
+    
     void start_Acquire();
     void stop_Acquire();
+
+    int Get_Fps();
+    void Set_Fps(int _fps);
     
 private :
     AppManager* appManager_;
@@ -67,6 +69,9 @@ private :
 
     void Create_Stream_Buffers();
     void Free_Stream_Buffers();
+    void Acquire_Images();
+    void Acquire_Images2();
+    void Send_Fps();
 };
 
 #endif

@@ -103,6 +103,12 @@ void DisplayMono8( uint8_t *aData, uint32_t aWidth, uint32_t aHeight )
 
 int main_eBus()
 {
+    HANDLE hConsole = GetStdHandle( STD_INPUT_HANDLE );
+    DWORD mode;
+    GetConsoleMode( hConsole, &mode );
+    SetConsoleMode( hConsole, mode & ~ENABLE_QUICK_EDIT_MODE );
+
+
     // Demarrer le thread de la fenetre avant la camera
     g_hWndReady = CreateEvent( NULL, TRUE, FALSE, NULL );
     HANDLE hThread = CreateThread( NULL, 0, WindowThread, NULL, 0, NULL );

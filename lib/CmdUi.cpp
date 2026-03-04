@@ -14,12 +14,6 @@ void CmdUi::Update_Output() {
 
     std::cout << "Output Thread running ..." << std::flush;
 
-    // TODO : faire en sorte qu'il cree autant de fenetre que de cam et verif avec GetTitle
-    // UVCamDisplay cam330("Cam330");
-    // cam330.Open(1280, 1024);
-    // UVCamDisplay cam310("Cam310");
-    // cam310.Open(1280, 1024);
-
     std::vector<UVCamDisplay*> cam_windows;
 
     for (CameraControler* cam : *(appManager_->Get_Cameras()))
@@ -31,23 +25,13 @@ void CmdUi::Update_Output() {
     while(appManager_->Get_Is_Running()) {
         current_output = outputQueue->pop();
         
-        // std::cout << "\n";
-
-        // TODO : affiche l'image
-        if(current_output->Get_P_Image_Buffer() != nullptr) {
+        // If too many image in the queue skip
+        if((current_output->Get_P_Image_Buffer() != nullptr)
+            && (outputQueue->size() < 10)) {
 
             uint8_t *data   = current_output->Get_P_Image_Buffer();
             uint32_t width  = current_output->Get_Width();
             uint32_t height = current_output->Get_Height();
-
-            
-            // if(*(current_output->Get_Source_Name()) == "cam330"){
-            //     cam330.PushFrame(data, width, height);
-            // }
-            
-            // if(*(current_output->Get_Source_Name()) == "cam310"){
-            //     cam310.PushFrame(data, width, height);
-            // }
             
             for (UVCamDisplay* window : cam_windows)
             {

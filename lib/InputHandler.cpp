@@ -2,6 +2,11 @@
 #include "CameraControler.h"
 #include "AppManager.h"
 
+#define INDEX_CMD 0
+#define INDEX_DEVICE_NAME 1
+#define INDEX_ARG_NAME 2
+#define INDEX_ARG_VALUE 3
+
 
 InputHandler::InputHandler(AppManager* _appManager_) 
 : appManager_(_appManager_), inputQueue(new ThreadSecureQueue<std::string*>())
@@ -19,19 +24,19 @@ void InputHandler::Update() {
 
         std::vector<std::string> split_input = split(*input);
 
-        if(split_input[0] == "exit") {
+        if(split_input[INDEX_CMD] == "exit") {
             exit_cmd();
         }
-        else if(split_input[0] == "connect") {
+        else if(split_input[INDEX_CMD] == "connect") {
             connect_cmd(split_input);
         }
-        else if(split_input[0] == "set") {
+        else if(split_input[INDEX_CMD] == "set") {
             set_cmd(split_input);
         }
-        else if(split_input[0] == "help") {
+        else if(split_input[INDEX_CMD] == "help") {
             help_cmd();
         }
-        else if(split_input[0] == "unblock_getline") {
+        else if(split_input[INDEX_CMD] == "unblock_getline") {
             // do nothing
         }
         else {
@@ -80,7 +85,7 @@ void InputHandler::connect_cmd(const std::vector<std::string>& split_input){
     }
 
     if(!result) {
-        new OutputPackage(appManager_, new std::string("Camera name not reconised."));
+        new OutputPackage(appManager_, new std::string("Device not found."));
         return;
     }
 
@@ -88,7 +93,32 @@ void InputHandler::connect_cmd(const std::vector<std::string>& split_input){
 }
 
 void InputHandler::set_cmd(const std::vector<std::string>& split_input){
-    // TODO : Implement la logique
+    CameraControler* selected_camera = NULL;
+
+    for (CameraControler* cam : *(appManager_->Get_Cameras())){
+        if(cam->Get_Data().name == split_input[INDEX_DEVICE_NAME]){
+            selected_camera = cam;
+        }
+    }
+
+    if(selected_camera == NULL) {
+        new OutputPackage(appManager_, new std::string("Device not found."));
+        return;
+    }
+
+    if(split_input[INDEX_ARG_NAME] == "fps") {
+        try {
+            selected_camera->Set_Fps(std::stoi(split_input[INDEX_ARG_VALUE]));
+        } catch (const std::invalid_argument&) {
+            new OutputPackage(appManager_, new std::string("Err : value must be an int."));
+        }
+    }
+    // else if(split_input[0] == "connect") {
+    //     connect_cmd(split_input);
+    // }
+    // else if(split_input[0] == "set") {
+    //     set_cmd(split_input);
+    // }
 }
 
 void InputHandler::help_cmd() {
@@ -96,7 +126,7 @@ void InputHandler::help_cmd() {
 
     msg += " - connect {cam330 or cam310} : try to connect to the designeted camera.\n";
     msg += " - exit : exit programme.\n";
-    msg += " - set target args value : set target's argument value.\n";
+    msg += " - set {target} {args} {value} : set target's argument value. (args : fps/width/eight)\n";
     msg += " - help : print commands.\n";
 
     new OutputPackage(appManager_, new std::string(msg));

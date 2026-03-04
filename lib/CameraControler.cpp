@@ -146,6 +146,77 @@ void CameraControler::Free_Stream_Buffers()
 
 void CameraControler::Acquire_Images() {
     Create_Stream_Buffers();
+    Send_Fps();
+
+    PvGenParameterArray *lDeviceParams = device->GetParameters();
+
+    // Map the GenICam AcquisitionStart and AcquisitionStop commands
+    PvGenCommand *lStart = dynamic_cast<PvGenCommand *>( lDeviceParams->Get( "AcquisitionStart" ) );
+    PvGenCommand *lStop = dynamic_cast<PvGenCommand *>( lDeviceParams->Get( "AcquisitionStop" ) );
+
+    // Get stream parameters
+    PvGenParameterArray *lStreamParams = stream->GetParameters();
+
+    // Map a few GenICam stream stats counters
+    PvGenFloat *lFrameRate = dynamic_cast<PvGenFloat *>( lStreamParams->Get( "AcquisitionRate" ) );
+    PvGenFloat *lBandwidth = dynamic_cast<PvGenFloat *>( lStreamParams->Get( "Bandwidth" ) );
+
+    device->StreamEnable();
+    lStart->Execute();
+
+    data.is_streaming = true;    
+
+    while ((appManager_->Get_Is_Running()) && (data.is_streaming))
+    {
+        PvBuffer *lBuffer = NULL;
+        PvResult lOperationResult;
+
+        // Retrieve next buffer
+        PvResult lResult = stream->RetrieveBuffer( &lBuffer, &lOperationResult, 1000 );
+
+        if (!lResult.IsOK()){
+            new OutputPackage(appManager_, new std::string("Err : Fail to recive buffer."));
+            continue;
+        }
+
+        if (!lOperationResult.IsOK()){
+            stream->QueueBuffer( lBuffer );
+            new OutputPackage(appManager_, new std::string("Err : Fail operqtion while recive buffer."));
+            continue;
+        }
+
+        if(lBuffer->GetPayloadType() ==  PvPayloadTypeImage) {
+            uint8_t *data   = lBuffer->GetImage()->GetDataPointer();
+            uint32_t width  = lBuffer->GetImage()->GetWidth();
+            uint32_t height = lBuffer->GetImage()->GetHeight();
+
+            // new OutputPackage(appManager_, new std::string("IMAGE RECIVED"));
+            new OutputPackage(appManager_, new std::string(this->data.name), data, width, height);
+        }
+        else {
+            new OutputPackage(appManager_, new std::string("Err : PayloadType not supported."));
+        }
+
+        stream->QueueBuffer( lBuffer );
+    }
+
+    lStop->Execute();
+    device->StreamDisable();
+    stream->AbortQueuedBuffers();
+    while ( stream->GetQueuedBufferCount() > 0 )
+    {
+        PvBuffer *lBuffer = NULL;
+        PvResult lOperationResult;
+
+        stream->RetrieveBuffer( &lBuffer, &lOperationResult );
+    }
+
+    Free_Stream_Buffers();
+}
+
+void CameraControler::Acquire_Images2() {
+    Create_Stream_Buffers();
+    Send_Fps();
 
     // Get device parameters need to control streaming
     PvGenParameterArray *lDeviceParams = device->GetParameters();
@@ -183,7 +254,7 @@ void CameraControler::Acquire_Images() {
 
     data.is_streaming = true;
 
-    while ((appManager_->Get_Is_Running()) || (data.is_streaming))
+    while ((appManager_->Get_Is_Running()) && (data.is_streaming))
     {
         PvBuffer *lBuffer = NULL;
         PvResult lOperationResult;
@@ -222,18 +293,22 @@ void CameraControler::Acquire_Images() {
 
                 case PvPayloadTypeChunkData:
                     // cout << " Chunk Data payload type" << " with " << lBuffer->GetChunkCount() << " chunks";
+                    new OutputPackage(appManager_, new std::string("AAAAAAAA"));
                     break;
-
-                case PvPayloadTypeRawData:
+                    
+                    case PvPayloadTypeRawData:
                     // cout << " Raw Data with " << lBuffer->GetRawData()->GetPayloadLength() << " bytes";
+                    new OutputPackage(appManager_, new std::string("BBBBBBBB"));
                     break;
-
-                case PvPayloadTypeMultiPart:
+                    
+                    case PvPayloadTypeMultiPart:
                     // cout << " Multi Part with " << lBuffer->GetMultiPartContainer()->GetPartCount() << " parts";
+                    new OutputPackage(appManager_, new std::string("CCCCCCCC"));
                     break;
-
-                case PvPayloadTypePleoraCompressed:
+                    
+                    case PvPayloadTypePleoraCompressed:
                     {
+                        new OutputPackage(appManager_, new std::string("DDDDDDDD"));
                         PvPixelType lPixelType = PvPixelUndefined;
                         uint32_t lWidth = 0, lHeight = 0;
                         PvDecompressionFilter::GetOutputFormatFor( lBuffer, lPixelType, lWidth, lHeight );
@@ -324,4 +399,35 @@ void CameraControler::stop_Acquire() {
     if(thread_acquire != NULL){
         thread_acquire->join();
     }
+}
+
+int CameraControler::Get_Fps() {
+    return data.fps;
+}
+
+void CameraControler::Set_Fps(int _fps){
+    data.fps = _fps;
+    if(data.is_connected){
+        Send_Fps();
+    }
+}
+
+void CameraControler::Send_Fps() {
+    if (!data.is_connected || device == nullptr) {
+        new OutputPackage(appManager_, new std::string("Err : Device not connected, impossible to send fps."));
+        return;
+    }
+
+    PvGenParameterArray *params = device->GetParameters();
+
+    // FPS
+    PvGenBoolean *lEnable = dynamic_cast<PvGenBoolean *>(
+        params->Get("AcquisitionFrameRateEnable")
+    );
+    if (lEnable) lEnable->SetValue(true);
+
+    PvGenFloat *lFPS = dynamic_cast<PvGenFloat *>(
+        params->Get("AcquisitionFrameRate")
+    );
+    if (lFPS) lFPS->SetValue((double)data.fps);
 }
