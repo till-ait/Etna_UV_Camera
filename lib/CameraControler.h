@@ -69,7 +69,6 @@ private :
     void Create_Stream_Buffers();
     void Free_Stream_Buffers();
     void Acquire_Images();
-    void Acquire_Images2();
     void Send_Fps();
     void Print_Param();
 };
