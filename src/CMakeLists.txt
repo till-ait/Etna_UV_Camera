@@ -21,6 +21,7 @@ target_link_libraries(Etna_UV_Camera PRIVATE
     PvStream64.lib
     PvBase64.lib
     PvBuffer64.lib
+    Qt6::Widgets
 )
 
 target_compile_options(Etna_UV_Camera PRIVATE /EHsc)

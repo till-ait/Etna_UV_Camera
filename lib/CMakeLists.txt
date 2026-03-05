@@ -57,6 +57,8 @@ target_include_directories(CmdUi PUBLIC
                             
 target_include_directories(QtUi PUBLIC 
                             ${CMAKE_CURRENT_SOURCE_DIR})
+
+target_link_libraries(QtUi PUBLIC Qt6::Widgets)                            
                             
 target_include_directories(InputHandler PUBLIC 
                             ${CMAKE_CURRENT_SOURCE_DIR})

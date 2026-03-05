@@ -1,13 +1,19 @@
 
 #include <semaphore>
+#include <QApplication>
+#include <QLabel>
 #include "QtUI.h"
 #include "InputHandler.h"
 
 void QtUi::Update_Output() {
     std::cout << "Output Thread running ..." << std::flush;
 
+    int argc = 0;
+    QApplication app(argc, nullptr);
+    QLabel label("Hello");
+    label.show();
+    app.exec();
     
-
     std::cout << "Output Thread closing ..." << std::endl;
 }
 
