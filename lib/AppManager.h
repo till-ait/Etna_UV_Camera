@@ -16,10 +16,10 @@ class CameraControler;
 
 class AppManager {
 public :
-    AppManager();
+    AppManager(char** argv);
     ~AppManager();
     
-    bool Start_App(void);
+    bool Start_App();
 
     std::vector<CameraControler*>* Get_Cameras();
 

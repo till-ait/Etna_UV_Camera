@@ -4,12 +4,21 @@
 #include "CmdUi.h"
 #include "CameraControler.h"
 
-AppManager::AppManager() {
+AppManager::AppManager(char** argv) {
     std::cout << "App Manager created." << std::endl;
     is_running = true;
     Cameras = new std::vector<CameraControler*>();
-    userInterface_ = new CmdUi(this);
     inputHandler_ = new InputHandler(this);
+
+    if(std::string(argv[1]) == "cmd") {
+        std::cout << "CMD selected" << std::endl;
+        userInterface_ = new CmdUi(this);
+    }
+    else {
+        std::cout << "QT selected" << std::endl;
+        // TODO : new qtUi
+        userInterface_ = new CmdUi(this);
+    }
 
 }
 
@@ -27,7 +36,7 @@ AppManager::~AppManager() {
     std::cout << "App Manager have been deleted." << std::endl;
 }
 
-bool AppManager::Start_App(void) {
+bool AppManager::Start_App() {
     std::cout << "App Start ... " << std::endl;
 
     std::thread UI_Output_Thread([this]() { userInterface_->Update_Output(); });
