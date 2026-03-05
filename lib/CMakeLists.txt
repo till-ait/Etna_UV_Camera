@@ -16,6 +16,9 @@ add_library(ThreadSecureQueue
 add_library(CmdUi
             CmdUi.cpp)
 
+add_library(QtUi
+            QtUi.cpp)
+
 add_library(InputHandler
             InputHandler.cpp)
 
@@ -50,6 +53,9 @@ target_include_directories(ThreadSecureQueue PUBLIC
                             ${CMAKE_CURRENT_SOURCE_DIR})
                             
 target_include_directories(CmdUi PUBLIC 
+                            ${CMAKE_CURRENT_SOURCE_DIR})
+                            
+target_include_directories(QtUi PUBLIC 
                             ${CMAKE_CURRENT_SOURCE_DIR})
                             
 target_include_directories(InputHandler PUBLIC 

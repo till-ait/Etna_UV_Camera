@@ -11,6 +11,7 @@ target_link_libraries(Etna_UV_Camera PRIVATE
     OutputPackage
     ThreadSecureQueue
     CmdUi
+    QtUi
     InputHandler
     gdi32
     UvcamDisplay

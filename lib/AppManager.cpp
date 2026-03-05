@@ -2,6 +2,7 @@
 #include "UserInterface.h"
 #include "InputHandler.h"
 #include "CmdUi.h"
+#include "QtUi.h"
 #include "CameraControler.h"
 
 AppManager::AppManager(char** argv) {
@@ -16,8 +17,7 @@ AppManager::AppManager(char** argv) {
     }
     else {
         std::cout << "QT selected" << std::endl;
-        // TODO : new qtUi
-        userInterface_ = new CmdUi(this);
+        userInterface_ = new QtUi(this);
     }
 
 }

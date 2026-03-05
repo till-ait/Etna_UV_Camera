@@ -4,13 +4,11 @@
 #include "hal_UV_Cam2.h"
 
 int main(int argc, char** argv) {
-
-    std::cout << "Have '" << argv[1] << "' arguments:\n";
-    for (int i = 0; i < argc; ++i) {
-        std::cout << argv[i] << "\n";
+    if(argc == 1) {
+        std::cout << "Need argument cmd or qt to run" << std::endl;
+        return 1;
     }
-
-
+    
     AppManager appManager_ = AppManager(argv);
 
     appManager_.Start_App();
