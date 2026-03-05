@@ -12,6 +12,10 @@ target_link_libraries(Etna_UV_Camera PRIVATE
     ThreadSecureQueue
     CmdUi
     InputHandler
+    gdi32
+    UvcamDisplay
+    hal_UV_Cam2
+    CameraControler
     PvDevice64.lib
     PvStream64.lib
     PvBase64.lib

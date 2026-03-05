@@ -9,6 +9,7 @@
 #include "OutputPackage.h"
 
 class AppManager;
+class CameraControler;
 
 class InputHandler {
 public:
@@ -28,6 +29,7 @@ private:
     std::vector<std::string> split(const std::string& str);
 
     void exit_cmd();
+    void connect_cmd(const std::vector<std::string>& split_input);
     void set_cmd(const std::vector<std::string>& split_input);
     void help_cmd();
     void default_cmd(const std::vector<std::string>& split_input);

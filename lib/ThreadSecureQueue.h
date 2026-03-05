@@ -48,6 +48,10 @@ public:
         cv_.notify_all();
     }
 
+    int size() {
+        return queue_.size();
+    }
+
 private:
     std::queue<T> queue_;
     mutable std::mutex mutex_;

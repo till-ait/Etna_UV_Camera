@@ -3,7 +3,6 @@
 
 #include <process.h>
 #include <conio.h>
-#include <windows.h>
 
 #include <stdio.h>
 #include <string>
@@ -32,10 +31,6 @@ typedef std::list<PvBuffer *> BufferList;
 
 #define BUFFER_COUNT ( 16 )
 
-// Fenetre GDI partagee entre les threads
-extern HWND   g_hWnd;
-extern HANDLE g_hWndReady;
-
 ///
 /// Function Prototypes
 ///
@@ -46,9 +41,6 @@ void CreateStreamBuffers( PvDevice *aDevice, PvStream *aStream, BufferList *aBuf
 void AcquireImages( PvDevice *aDevice, PvStream *aStream );
 void FreeStreamBuffers( BufferList *aBufferList );
 
-DWORD WINAPI WindowThread( LPVOID lpParam );
-void DisplayMono8( uint8_t *aData, uint32_t aWidth, uint32_t aHeight );
-
-int main_eBus();
+int main_eBus2();
 
 #endif

@@ -5,6 +5,8 @@
 #include "AppManager.h"
 #include "OutputPackage.h"
 #include "InputHandler.h"
+#include "UVCamDisplay.h"
+#include "CameraControler.h"
 
 void CmdUi::Update_Output() {
     std::string msg;
@@ -12,41 +14,64 @@ void CmdUi::Update_Output() {
 
     std::cout << "Output Thread running ..." << std::flush;
 
+    std::vector<UVCamDisplay*> cam_windows;
+
+    for (CameraControler* cam : *(appManager_->Get_Cameras()))
+    {
+        cam_windows.push_back(new UVCamDisplay(cam->Get_Data().name));
+        cam_windows.back()->Open(500, 500);
+    }
+
     while(appManager_->Get_Is_Running()) {
         current_output = outputQueue->pop();
-        
-        std::cout << "\n";
 
-        // TODO : affiche l'image
-        if(current_output->Get_P_Image_Buffer() != nullptr) {
-            std::cout << "Display Image from " 
-            << current_output->Get_Source_Name() 
-            << std::endl;
+        // If too many image in the queue skip
+        if((current_output->Get_P_Image_Buffer() != nullptr)
+            && (outputQueue->size() < 10)) {
+
+            uint8_t *data   = current_output->Get_P_Image_Buffer();
+            uint32_t width  = current_output->Get_Width();
+            uint32_t height = current_output->Get_Height();
+            
+            for (UVCamDisplay* window : cam_windows)
+            {
+                if(*(current_output->Get_Source_Name()) == window->GetTitle()){
+                    window->PushFrame(data, width, height);
+                }
+            }
         }
 
         // TODO : faire en sorte qu'il affiche la structur des parametre de la cam ou spectro
         if(current_output->Get_P_Data_Buffer() != nullptr) {
             std::cout << "Data : " 
             << *(current_output->Get_P_Data_Buffer()) 
-            << " from" << current_output->Get_Source_Name()
+            << " from" << *(current_output->Get_Source_Name())
             << std::endl;
+            std::cout << ">" << std::flush;
         }
 
         if(current_output->Get_Display_Msg() != nullptr) {
             std::cout << *(current_output->Get_Display_Msg()) << std::endl;
+            std::cout << ">" << std::flush;
         }
         
         if(appManager_->Get_Is_Running()){
-            std::cout << ">" << std::flush;
             delete current_output;
         }
     }
+
+    for (UVCamDisplay* window : cam_windows)
+    {
+        window->Close();
+        delete window;
+    }
+
     std::cout << "Output Thread closing ..." << std::endl;
 }
 
 void CmdUi::Update_Input() {
     std::string user_input;
-    //std::cout << "Input Thread running ..." << std::endl;
+    
     new OutputPackage(appManager_, new std::string("Input Thread running ..."));
     std::binary_semaphore& signal_Input_Handled = appManager_->Get_InputHandler()->Get_Input_Handled();
 
