@@ -11,6 +11,7 @@ public:
 
     void Update_Output() override;
     void Update_Input() override;
+    void Push_Frame(std::string* source_Name, uint8_t *data, uint32_t width, uint32_t height) override;
 };
 
 #endif

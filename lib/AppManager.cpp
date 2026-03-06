@@ -39,15 +39,18 @@ AppManager::~AppManager() {
 bool AppManager::Start_App() {
     std::cout << "App Start ... " << std::endl;
 
-    std::thread UI_Output_Thread([this]() { userInterface_->Update_Output(); });
     std::thread UI_Input_Thread([this]() { userInterface_->Update_Input(); });
     std::thread InputHandler_Thread([this]() { inputHandler_->Update(); });
-
+    
     // TODO : utiliser un fichier de configuration pour ne pas avoir a reconfig a chaque fois
     Cameras->push_back(new CameraControler((this), "cam330", "169.254.1.222"));
     Cameras->push_back(new CameraControler((this), "cam310", "169.254.1.248"));
+    
+    // std::thread UI_Output_Thread([this]() { userInterface_->Update_Output(); });
 
-    UI_Output_Thread.join();
+    userInterface_->Update_Output();
+    
+    // UI_Output_Thread.join();
     UI_Input_Thread.join();
     InputHandler_Thread.join();
     for (CameraControler* cam : *Cameras)

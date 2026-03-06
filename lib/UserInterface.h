@@ -15,6 +15,7 @@ public :
 
     virtual void Update_Output() =0;
     virtual void Update_Input() =0;
+    virtual void Push_Frame(std::string* source_Name, uint8_t *data, uint32_t width, uint32_t height) =0;
 
     ThreadSecureQueue<OutputPackage*>* GetOutputQueue(void);
 

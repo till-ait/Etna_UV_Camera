@@ -1,6 +1,7 @@
 #include "CameraControler.h"
 #include "ThreadSecureQueue.h"
 #include "OutputPackage.h"
+#include "UserInterface.h"
 
 #include <PvSampleUtils.h>
 #include <PvSystem.h>
@@ -191,7 +192,8 @@ void CameraControler::Acquire_Images() {
             uint32_t height = lBuffer->GetImage()->GetHeight();
 
             // new OutputPackage(appManager_, new std::string("IMAGE RECIVED"));
-            new OutputPackage(appManager_, new std::string(this->data.name), data, width, height);
+            // new OutputPackage(appManager_, new std::string(this->data.name), data, width, height);
+            appManager_->Get_UserInterface()->Push_Frame(new std::string(this->data.name), data, width, height);
         }
         else {
             new OutputPackage(appManager_, new std::string("Err : PayloadType not supported."));
