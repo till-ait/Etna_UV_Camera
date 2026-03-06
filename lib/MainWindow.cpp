@@ -2,9 +2,16 @@
 #include "AppManager.h"
 #include "InputHandler.h"
 #include <QApplication> 
+#include <QDateTime>
+#include <thread>
 
 MainWindow::MainWindow(AppManager* appManager, QWidget *parent)
 : QWidget(parent), appManager_(appManager) {
+    save_images = false;
+    time_between_save_ms = DEFAULT_PERIODE;
+    time_last_save_cam330 = std::chrono::steady_clock::now();
+    time_last_save_cam310 = std::chrono::steady_clock::now();
+
     //// LAYOUT ////
 
     mainLayout = new QVBoxLayout();
@@ -22,9 +29,11 @@ MainWindow::MainWindow(AppManager* appManager, QWidget *parent)
     CamLayout->setContentsMargins(10, 10, 10, 10);
     btn_connect_cam330 = new QPushButton("Connect cam330");
     btn_connect_cam310 = new QPushButton("Connect cam310");
+    btn_save_images = new QPushButton("Save Images");
     btn_exit = new QPushButton("Exit");
     CamBtLayout->addWidget(btn_connect_cam330);
     CamBtLayout->addWidget(btn_connect_cam310);
+    CamBtLayout->addWidget(btn_save_images);
     CamBtLayout->addWidget(btn_exit);
     CamBtLayout->addStretch();
     CamLayout->addLayout(CamBtLayout, CAMBTLAYOUT_STRENGTH);
@@ -34,8 +43,8 @@ MainWindow::MainWindow(AppManager* appManager, QWidget *parent)
     img_cam310 = new QLabel("Cam310");
     img_cam330->setAlignment(Qt::AlignCenter);
     img_cam310->setAlignment(Qt::AlignCenter);
-    img_cam330->setMinimumSize(180, 180);
-    img_cam310->setMinimumSize(180, 180);
+    img_cam330->setMinimumSize(VIDEO_WIDTH, VIDEO_HEIGH);
+    img_cam310->setMinimumSize(VIDEO_WIDTH, VIDEO_HEIGH);
     CamVideoLayout->addWidget(img_cam330);
     CamVideoLayout->addWidget(img_cam310);
     // CamVideoLayout->addStretch();
@@ -73,17 +82,55 @@ MainWindow::MainWindow(AppManager* appManager, QWidget *parent)
     QObject::connect(btn_connect_cam310, &QPushButton::clicked, [&]() {
         appManager_->Get_InputHandler()->Get_InputQueue()->push(new std::string("connect cam310"));
     });
+
+    QObject::connect(btn_save_images, &QPushButton::clicked, [&]() {
+        if(save_images){
+            save_images = false;
+            btn_save_images->setText("Save Images");
+        }
+        else {
+            save_images = true;
+            btn_save_images->setText("Stop Save");
+        }
+    });
 }
 
 
 void MainWindow::onNewFrame(QString sourceName, QImage image) {
-    // Ici on est dans le thread principal → Qt est content
+    std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
+
     if (sourceName == "cam330") {
         img_cam330->setPixmap(QPixmap::fromImage(image).scaled(
         img_cam330->size(), Qt::KeepAspectRatio));
+        
+        double elapsed = std::chrono::duration<double, std::milli>(now - time_last_save_cam330).count();
+
+        if (save_images && (elapsed >= time_between_save_ms)) {
+            QString filename = "C:\\Users\\Panasonic\\Desktop\\Till\\Image_saved\\" + sourceName + "_" + 
+                    QDateTime::currentDateTime().toString("yyyyMMdd_hhmmss") + ".png";
+            
+            QImage imageCopy = image.copy();
+            QString filenameCopy = filename;
+            std::thread([imageCopy, filenameCopy]() {imageCopy.save(filenameCopy);}).detach();
+
+            time_last_save_cam330 = std::chrono::steady_clock::now();
+        }
     }
     else if (sourceName == "cam310") {
         img_cam310->setPixmap(QPixmap::fromImage(image).scaled(
         img_cam310->size(), Qt::KeepAspectRatio));
+
+        double elapsed = std::chrono::duration<double, std::milli>(now - time_last_save_cam310).count();
+
+        if (save_images && (elapsed >= time_between_save_ms)) {
+            QString filename = "C:\\Users\\Panasonic\\Desktop\\Till\\Image_saved\\" + sourceName + "_" + 
+                    QDateTime::currentDateTime().toString("yyyyMMdd_hhmmss") + ".png";
+            
+            QImage imageCopy = image.copy();
+            QString filenameCopy = filename;
+            std::thread([imageCopy, filenameCopy]() {imageCopy.save(filenameCopy);}).detach();
+
+            time_last_save_cam310 = std::chrono::steady_clock::now();
+        }
     }
 }

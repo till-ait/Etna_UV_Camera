@@ -5,6 +5,14 @@
 #include "QtUi.h"
 #include "CameraControler.h"
 
+AppManager::AppManager() {
+    std::cout << "App Manager created." << std::endl;
+    is_running = true;
+    Cameras = new std::vector<CameraControler*>();
+    inputHandler_ = new InputHandler(this);
+    userInterface_ = new QtUi(this);
+}
+
 AppManager::AppManager(char** argv) {
     std::cout << "App Manager created." << std::endl;
     is_running = true;

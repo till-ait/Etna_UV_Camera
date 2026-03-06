@@ -16,6 +16,7 @@ class CameraControler;
 
 class AppManager {
 public :
+    AppManager();
     AppManager(char** argv);
     ~AppManager();
     
