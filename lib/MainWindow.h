@@ -9,6 +9,7 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QSpinBox>
+#include <QGroupBox>
 #include <string>
 
 #define DEFAULT_PERIODE 10000
@@ -65,10 +66,17 @@ private:
     QSpinBox *spin_periode;
     QPushButton *btn_exit;
 
+    QVBoxLayout *layout_cam330;
+    QVBoxLayout *layout_cam310;
     QLabel *img_cam330;
     QLabel *img_cam310;
 
     QLabel *img_spectro;
+
+    QGroupBox *group_cameras_control;
+    QGroupBox *group_cam330;
+    QGroupBox *group_cam310;
+    QGroupBox *group_spectrometer;
 };
 
 #endif

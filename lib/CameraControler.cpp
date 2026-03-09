@@ -240,7 +240,7 @@ void CameraControler::Set_Fps(int _fps){
 
 void CameraControler::Send_Fps() {
     if (!data.is_connected || device == nullptr) {
-        new OutputPackage(appManager_, new std::string("Err : Device not connected, impossible to send fps."));
+        appManager_->Get_UserInterface()->Ui_Print("Err : Device not connected, impossible to send fps.");
         return;
     }
 
