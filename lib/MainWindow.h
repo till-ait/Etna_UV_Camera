@@ -7,6 +7,8 @@
 #include <QHBoxLayout>
 #include <QPushButton>
 #include <QFileDialog>
+#include <QMessageBox>
+#include <string>
 
 #define DEFAULT_PERIODE 10000
 
@@ -31,6 +33,7 @@ public:
 public slots:
     // Appelé depuis le thread principal quand une image arrive
     void onNewFrame(QString sourceName, QImage image);
+    void printQt(QString msg);
 
 private:
     bool save_images;

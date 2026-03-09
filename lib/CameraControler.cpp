@@ -66,27 +66,27 @@ bool CameraControler::Try_Connection() {
     device = PvDevice::CreateAndConnect( deviceID, pv_result);
 
     if(device == NULL) {
-        new OutputPackage(appManager_, new std::string("Err : can't connect"));
+        appManager_->Get_UserInterface()->Ui_Print("Err : can't connect");
         return result = false;
     }
     stream = PvStream::CreateAndOpen( deviceID, pv_result);
     
     if(stream == NULL) {
-        new OutputPackage(appManager_, new std::string("Err : can't open stream"));
+        appManager_->Get_UserInterface()->Ui_Print("Err : can't open stream");
         return result = false;
     }
     
     device_GEV = dynamic_cast<PvDeviceGEV *>( device );
     
     if(device_GEV == NULL) {
-        new OutputPackage(appManager_, new std::string("Err : can't connect with GEV"));
+        appManager_->Get_UserInterface()->Ui_Print("Err : can't connect with GEV");
         return result = false;
     }
     
     PvStreamGEV *stream_GEV = static_cast<PvStreamGEV *>( stream );
     
     if(stream_GEV == NULL) {
-        new OutputPackage(appManager_, new std::string("Err : can't open GEV stream"));
+        appManager_->Get_UserInterface()->Ui_Print("Err : can't open GEV stream");
         return result = false;
     }
     
@@ -176,13 +176,13 @@ void CameraControler::Acquire_Images() {
         PvResult lResult = stream->RetrieveBuffer( &lBuffer, &lOperationResult, 1000 );
 
         if (!lResult.IsOK()){
-            new OutputPackage(appManager_, new std::string("Err : Fail to recive buffer."));
+            appManager_->Get_UserInterface()->Ui_Print("Err : Fail to recive buffer.");
             continue;
         }
 
         if (!lOperationResult.IsOK()){
             stream->QueueBuffer( lBuffer );
-            new OutputPackage(appManager_, new std::string("Err : Fail operqtion while recive buffer."));
+            appManager_->Get_UserInterface()->Ui_Print("Err : Fail operqtion while recive buffer.");
             continue;
         }
 
@@ -196,7 +196,7 @@ void CameraControler::Acquire_Images() {
             appManager_->Get_UserInterface()->Push_Frame(new std::string(this->data.name), data, width, height);
         }
         else {
-            new OutputPackage(appManager_, new std::string("Err : PayloadType not supported."));
+            appManager_->Get_UserInterface()->Ui_Print("Err : PayloadType not supported.");
         }
 
         stream->QueueBuffer( lBuffer );

@@ -95,7 +95,7 @@ MainWindow::MainWindow(AppManager* appManager, QWidget *parent)
     QObject::connect(btn_save_images, &QPushButton::clicked, [&]() {
         if(save_folder == ""){
             save_images = false;
-            // TODO : ERRO MESSAGE
+            printQt("No destination folder selected.");
             return;
         }
 
@@ -138,7 +138,7 @@ void MainWindow::onNewFrame(QString sourceName, QImage image) {
         double elapsed = std::chrono::duration<double, std::milli>(now - time_last_save_cam310).count();
 
         if (save_images && (elapsed >= time_between_save_ms)) {
-            QString filename = "C:\\Users\\Panasonic\\Desktop\\Till\\Image_saved\\" + sourceName + "_" + 
+            QString filename = save_folder + sourceName + "_" + 
                     QDateTime::currentDateTime().toString("yyyyMMdd_hhmmss") + ".png";
             
             QImage imageCopy = image.copy();
@@ -148,4 +148,8 @@ void MainWindow::onNewFrame(QString sourceName, QImage image) {
             time_last_save_cam310 = std::chrono::steady_clock::now();
         }
     }
+}
+
+void MainWindow::printQt(QString msg){
+    QMessageBox::warning(this, "Error", msg);
 }

@@ -112,3 +112,12 @@ void QtUi::Push_Frame(std::string* source_Name, uint8_t *data, uint32_t width, u
         Q_ARG(QImage, imgCopy)
     );
 }
+
+void QtUi::Ui_Print(std::string msg) {
+    QMetaObject::invokeMethod(
+        window,
+        "printQt",
+        Qt::QueuedConnection,
+        Q_ARG(QString, QString::fromStdString(msg))
+    );
+}

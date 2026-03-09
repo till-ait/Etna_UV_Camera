@@ -1,6 +1,7 @@
 #include "InputHandler.h"
 #include "CameraControler.h"
 #include "AppManager.h"
+#include "UserInterface.h"
 
 #define INDEX_CMD 0
 #define INDEX_DEVICE_NAME 1
@@ -60,7 +61,8 @@ std::vector<std::string> InputHandler::split(const std::string& str) {
 }
 
 void InputHandler::exit_cmd(){
-    new OutputPackage(appManager_, new std::string("Terminate Threads... "));
+    // new OutputPackage(appManager_, new std::string("Terminate Threads... "));
+    appManager_->Get_UserInterface()->Ui_Print("Terminate Threads... ");
     appManager_->Set_Is_Running(false);
 }
 
@@ -75,7 +77,7 @@ void InputHandler::connect_cmd(const std::vector<std::string>& split_input){
             result = cameras->at(i)->Try_Connection();
 
             if(!result) {
-                new OutputPackage(appManager_, new std::string("Connection failed."));
+                appManager_->Get_UserInterface()->Ui_Print("Connection failed.");
                 return;
             }
 
@@ -84,7 +86,7 @@ void InputHandler::connect_cmd(const std::vector<std::string>& split_input){
     }
 
     if(!result) {
-        new OutputPackage(appManager_, new std::string("Device not found."));
+        appManager_->Get_UserInterface()->Ui_Print("Device not found.");
         return;
     }
 
@@ -101,7 +103,7 @@ void InputHandler::set_cmd(const std::vector<std::string>& split_input){
     }
 
     if(selected_camera == NULL) {
-        new OutputPackage(appManager_, new std::string("Device not found."));
+        appManager_->Get_UserInterface()->Ui_Print("Device not found.");
         return;
     }
 
@@ -109,7 +111,7 @@ void InputHandler::set_cmd(const std::vector<std::string>& split_input){
         try {
             selected_camera->Set_Fps(std::stoi(split_input[INDEX_ARG_VALUE]));
         } catch (const std::invalid_argument&) {
-            new OutputPackage(appManager_, new std::string("Err : value must be an int."));
+            appManager_->Get_UserInterface()->Ui_Print("Err : value must be an int.");
         }
     }
 }
@@ -122,7 +124,7 @@ void InputHandler::help_cmd() {
     msg += " - set {target} {args} {value} : set target's argument value. (args : fps/width/eight)\n";
     msg += " - help : print commands.\n";
 
-    new OutputPackage(appManager_, new std::string(msg));
+    appManager_->Get_UserInterface()->Ui_Print(msg);
 }
 
 void InputHandler::default_cmd(const std::vector<std::string>& split_input) {
@@ -130,7 +132,7 @@ void InputHandler::default_cmd(const std::vector<std::string>& split_input) {
     msg += split_input[0];
     msg += "' isn't a existing commmand, enter 'help' to see the available commads.";
 
-    new OutputPackage(appManager_, new std::string(msg));
+    appManager_->Get_UserInterface()->Ui_Print(msg);
 }
 
 ThreadSecureQueue<std::string*>* InputHandler::Get_InputQueue() {

@@ -88,3 +88,7 @@ void CmdUi::Update_Input() {
 void CmdUi::Push_Frame(std::string* source_Name, uint8_t *data, uint32_t width, uint32_t height) {
     new OutputPackage(appManager_, source_Name, data, width, height);
 }
+
+void CmdUi::Ui_Print(std::string msg) {
+    new OutputPackage(appManager_, new std::string(msg));
+}
