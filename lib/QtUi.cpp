@@ -8,7 +8,7 @@ void QtUi::Update_Output() {
     int argc = 0;
     QApplication Ui(argc, nullptr);
     
-    window = new MainWindow(appManager_);  // ✅
+    window = new MainWindow(appManager_);
     window->setWindowTitle("Camera controler interface");
     window->resize(800, 600);
     window->show();

@@ -6,6 +6,7 @@
 #include <QLabel>
 #include <QHBoxLayout>
 #include <QPushButton>
+#include <QFileDialog>
 
 #define DEFAULT_PERIODE 10000
 
@@ -36,6 +37,7 @@ private:
     long time_between_save_ms;
     std::chrono::steady_clock::time_point time_last_save_cam330;
     std::chrono::steady_clock::time_point time_last_save_cam310;
+    QString save_folder;
 
     AppManager* appManager_;
 
@@ -51,6 +53,7 @@ private:
 
     QPushButton *btn_connect_cam330;
     QPushButton *btn_connect_cam310;
+    QPushButton *btn_select_save_folder;
     QPushButton *btn_save_images;
     QPushButton *btn_exit;
 

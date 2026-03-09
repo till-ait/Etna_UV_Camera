@@ -11,6 +11,7 @@ MainWindow::MainWindow(AppManager* appManager, QWidget *parent)
     time_between_save_ms = DEFAULT_PERIODE;
     time_last_save_cam330 = std::chrono::steady_clock::now();
     time_last_save_cam310 = std::chrono::steady_clock::now();
+    save_folder = "";
 
     //// LAYOUT ////
 
@@ -29,10 +30,12 @@ MainWindow::MainWindow(AppManager* appManager, QWidget *parent)
     CamLayout->setContentsMargins(10, 10, 10, 10);
     btn_connect_cam330 = new QPushButton("Connect cam330");
     btn_connect_cam310 = new QPushButton("Connect cam310");
+    btn_select_save_folder = new QPushButton("Select save folder.");
     btn_save_images = new QPushButton("Save Images");
     btn_exit = new QPushButton("Exit");
     CamBtLayout->addWidget(btn_connect_cam330);
     CamBtLayout->addWidget(btn_connect_cam310);
+    CamBtLayout->addWidget(btn_select_save_folder);
     CamBtLayout->addWidget(btn_save_images);
     CamBtLayout->addWidget(btn_exit);
     CamBtLayout->addStretch();
@@ -83,7 +86,19 @@ MainWindow::MainWindow(AppManager* appManager, QWidget *parent)
         appManager_->Get_InputHandler()->Get_InputQueue()->push(new std::string("connect cam310"));
     });
 
+    QObject::connect(btn_select_save_folder, &QPushButton::clicked, [&]() {
+        QString folder = QFileDialog::getExistingDirectory(this, "Select a folder", "C:/", QFileDialog::ShowDirsOnly);
+        if (!folder.isEmpty()) save_folder = folder;
+    });
+
+
     QObject::connect(btn_save_images, &QPushButton::clicked, [&]() {
+        if(save_folder == ""){
+            save_images = false;
+            // TODO : ERRO MESSAGE
+            return;
+        }
+
         if(save_images){
             save_images = false;
             btn_save_images->setText("Save Images");
@@ -106,7 +121,7 @@ void MainWindow::onNewFrame(QString sourceName, QImage image) {
         double elapsed = std::chrono::duration<double, std::milli>(now - time_last_save_cam330).count();
 
         if (save_images && (elapsed >= time_between_save_ms)) {
-            QString filename = "C:\\Users\\Panasonic\\Desktop\\Till\\Image_saved\\" + sourceName + "_" + 
+            QString filename = save_folder + sourceName + "_" + 
                     QDateTime::currentDateTime().toString("yyyyMMdd_hhmmss") + ".png";
             
             QImage imageCopy = image.copy();
