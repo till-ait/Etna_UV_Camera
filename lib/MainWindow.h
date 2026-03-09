@@ -8,6 +8,7 @@
 #include <QPushButton>
 #include <QFileDialog>
 #include <QMessageBox>
+#include <QSpinBox>
 #include <string>
 
 #define DEFAULT_PERIODE 10000
@@ -29,6 +30,8 @@ class MainWindow : public QWidget {
 
 public:
     MainWindow(AppManager* appManager, QWidget *parent = nullptr);
+
+    void Set_Time_between_save(long value);
 
 public slots:
     // Appelé depuis le thread principal quand une image arrive
@@ -58,6 +61,8 @@ private:
     QPushButton *btn_connect_cam310;
     QPushButton *btn_select_save_folder;
     QPushButton *btn_save_images;
+    QLabel *label_periode;
+    QSpinBox *spin_periode;
     QPushButton *btn_exit;
 
     QLabel *img_cam330;

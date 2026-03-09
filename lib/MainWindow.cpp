@@ -32,10 +32,17 @@ MainWindow::MainWindow(AppManager* appManager, QWidget *parent)
     btn_connect_cam310 = new QPushButton("Connect cam310");
     btn_select_save_folder = new QPushButton("Select save folder.");
     btn_save_images = new QPushButton("Save Images");
+    label_periode = new QLabel("Periode between save :");
+    spin_periode = new QSpinBox();
+    spin_periode->setMinimum(63);
+    spin_periode->setMaximum(1000000);
+    spin_periode->setSuffix(" ms");
     btn_exit = new QPushButton("Exit");
     CamBtLayout->addWidget(btn_connect_cam330);
     CamBtLayout->addWidget(btn_connect_cam310);
     CamBtLayout->addWidget(btn_select_save_folder);
+    CamBtLayout->addWidget(label_periode);
+    CamBtLayout->addWidget(spin_periode);
     CamBtLayout->addWidget(btn_save_images);
     CamBtLayout->addWidget(btn_exit);
     CamBtLayout->addStretch();
@@ -108,6 +115,10 @@ MainWindow::MainWindow(AppManager* appManager, QWidget *parent)
             btn_save_images->setText("Stop Save");
         }
     });
+
+    QObject::connect(spin_periode, &QSpinBox::valueChanged, [&](long value) {
+        Set_Time_between_save(value);
+    });
 }
 
 
@@ -152,4 +163,10 @@ void MainWindow::onNewFrame(QString sourceName, QImage image) {
 
 void MainWindow::printQt(QString msg){
     QMessageBox::warning(this, "Error", msg);
+}
+
+void MainWindow::Set_Time_between_save(long value) {
+    if(value < 62) {
+        time_between_save_ms = value;
+    }
 }
