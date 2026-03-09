@@ -5,6 +5,8 @@
 #include <QDateTime>
 #include <thread>
 
+#include <iostream>
+
 MainWindow::MainWindow(AppManager* appManager, QWidget *parent)
 : QWidget(parent), appManager_(appManager) {
     save_images = false;
@@ -38,6 +40,7 @@ MainWindow::MainWindow(AppManager* appManager, QWidget *parent)
     spin_periode->setMaximum(1000000);
     spin_periode->setSuffix(" ms");
     btn_exit = new QPushButton("Exit");
+
     CamBtLayout->addWidget(btn_connect_cam330);
     CamBtLayout->addWidget(btn_connect_cam310);
     CamBtLayout->addWidget(btn_select_save_folder);
@@ -95,7 +98,7 @@ MainWindow::MainWindow(AppManager* appManager, QWidget *parent)
 
     QObject::connect(btn_select_save_folder, &QPushButton::clicked, [&]() {
         QString folder = QFileDialog::getExistingDirectory(this, "Select a folder", "C:/", QFileDialog::ShowDirsOnly);
-        if (!folder.isEmpty()) save_folder = folder;
+        if (!folder.isEmpty()) save_folder = folder + "/";
     });
 
 
@@ -103,7 +106,8 @@ MainWindow::MainWindow(AppManager* appManager, QWidget *parent)
         if(save_folder == ""){
             save_images = false;
             printQt("No destination folder selected.");
-            return;
+            QString folder = QFileDialog::getExistingDirectory(this, "Select a folder", "C:/", QFileDialog::ShowDirsOnly);
+            if (!folder.isEmpty()) save_folder = folder + "/";
         }
 
         if(save_images){
@@ -124,7 +128,7 @@ MainWindow::MainWindow(AppManager* appManager, QWidget *parent)
 
 void MainWindow::onNewFrame(QString sourceName, QImage image) {
     std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
-
+    
     if (sourceName == "cam330") {
         img_cam330->setPixmap(QPixmap::fromImage(image).scaled(
         img_cam330->size(), Qt::KeepAspectRatio));
@@ -132,8 +136,9 @@ void MainWindow::onNewFrame(QString sourceName, QImage image) {
         double elapsed = std::chrono::duration<double, std::milli>(now - time_last_save_cam330).count();
 
         if (save_images && (elapsed >= time_between_save_ms)) {
-            QString filename = save_folder + sourceName + "_" + 
-                    QDateTime::currentDateTime().toString("yyyyMMdd_hhmmss") + ".png";
+            QString filename = save_folder + 
+                    QDateTime::currentDateTime().toString("yyyyMMdd_hhmmss_zzz") 
+                    + "_" + sourceName + ".png";
             
             QImage imageCopy = image.copy();
             QString filenameCopy = filename;
@@ -147,10 +152,10 @@ void MainWindow::onNewFrame(QString sourceName, QImage image) {
         img_cam310->size(), Qt::KeepAspectRatio));
 
         double elapsed = std::chrono::duration<double, std::milli>(now - time_last_save_cam310).count();
-
         if (save_images && (elapsed >= time_between_save_ms)) {
-            QString filename = save_folder + sourceName + "_" + 
-                    QDateTime::currentDateTime().toString("yyyyMMdd_hhmmss") + ".png";
+            QString filename = save_folder + 
+                    QDateTime::currentDateTime().toString("yyyyMMdd_hhmmss_zzz") 
+                    + "_" + sourceName + ".png";
             
             QImage imageCopy = image.copy();
             QString filenameCopy = filename;
@@ -166,7 +171,7 @@ void MainWindow::printQt(QString msg){
 }
 
 void MainWindow::Set_Time_between_save(long value) {
-    if(value < 62) {
+    if(value > 62) {
         time_between_save_ms = value;
     }
 }
