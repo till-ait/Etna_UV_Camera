@@ -24,6 +24,7 @@
 
 
 class AppManager;
+class CamView;
 
 
 class MainWindow : public QWidget {
@@ -64,12 +65,13 @@ private:
     QPushButton *btn_save_images;
     QLabel *label_periode;
     QSpinBox *spin_periode;
+    QPushButton *btn_recenter_cross;
     QPushButton *btn_exit;
 
     QVBoxLayout *layout_cam330;
     QVBoxLayout *layout_cam310;
-    QLabel *img_cam330;
-    QLabel *img_cam310;
+    CamView *img_cam330;
+    CamView *img_cam310;
 
     QLabel *img_spectro;
 

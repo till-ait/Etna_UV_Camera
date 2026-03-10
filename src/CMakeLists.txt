@@ -18,6 +18,7 @@ target_link_libraries(Etna_UV_Camera PRIVATE
     hal_UV_Cam2
     CameraControler
     MainWindow
+    CamView
     PvDevice64.lib
     PvStream64.lib
     PvBase64.lib

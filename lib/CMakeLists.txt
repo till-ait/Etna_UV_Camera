@@ -34,6 +34,9 @@ add_library(CameraControler
 add_library(MainWindow
             MainWindow.cpp)
 
+add_library(CamView
+            CamView.cpp)
+
 target_include_directories(hal_UV_Cam PUBLIC 
                             ${CMAKE_CURRENT_SOURCE_DIR}
                             ${EBUS_INCLUDE_DIR})
@@ -68,6 +71,11 @@ target_include_directories(MainWindow PUBLIC
                             ${CMAKE_CURRENT_SOURCE_DIR})
 
 target_link_libraries(MainWindow PUBLIC Qt6::Widgets)                            
+                            
+target_include_directories(CamView PUBLIC 
+                            ${CMAKE_CURRENT_SOURCE_DIR})
+
+target_link_libraries(CamView PUBLIC Qt6::Widgets)                            
                             
 target_include_directories(InputHandler PUBLIC 
                             ${CMAKE_CURRENT_SOURCE_DIR})

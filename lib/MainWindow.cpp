@@ -4,6 +4,7 @@
 #include <QApplication> 
 #include <QDateTime>
 #include <thread>
+#include "CamView.h"
 
 #include <iostream>
 
@@ -46,6 +47,7 @@ MainWindow::MainWindow(AppManager* appManager, QWidget *parent)
     spin_periode->setMinimum(63);
     spin_periode->setMaximum(1000000);
     spin_periode->setSuffix(" ms");
+    btn_recenter_cross = new QPushButton("Recenter cross");
     btn_exit = new QPushButton("Exit");
 
     CamBtLayout->addWidget(btn_connect_cam330);
@@ -54,14 +56,15 @@ MainWindow::MainWindow(AppManager* appManager, QWidget *parent)
     CamBtLayout->addWidget(label_periode);
     CamBtLayout->addWidget(spin_periode);
     CamBtLayout->addWidget(btn_save_images);
+    CamBtLayout->addWidget(btn_recenter_cross);
     CamBtLayout->addWidget(btn_exit);
     CamBtLayout->addStretch();
     group_cameras_control->setLayout(CamBtLayout);
     CamLayout->addWidget(group_cameras_control, CAMBTLAYOUT_STRENGTH);
 
     CamVideoLayout->setContentsMargins(0, 0, 0, 0);
-    img_cam330 = new QLabel("Cam330");
-    img_cam310 = new QLabel("Cam310");
+    img_cam330 = new CamView();
+    img_cam310 = new CamView();
     img_cam330->setAlignment(Qt::AlignCenter);
     img_cam310->setAlignment(Qt::AlignCenter);
     img_cam330->setMinimumSize(VIDEO_WIDTH, VIDEO_HEIGH);
@@ -116,6 +119,11 @@ MainWindow::MainWindow(AppManager* appManager, QWidget *parent)
         QString folder = QFileDialog::getExistingDirectory(this, "Select a folder", "C:/", QFileDialog::ShowDirsOnly);
         if (!folder.isEmpty()) save_folder = folder + "/";
     });
+    
+    QObject::connect(btn_recenter_cross, &QPushButton::clicked, [&]() {
+        img_cam330->RecenterCross();
+        img_cam310->RecenterCross();
+    });
 
 
     QObject::connect(btn_save_images, &QPushButton::clicked, [&]() {
@@ -146,8 +154,7 @@ void MainWindow::onNewFrame(QString sourceName, QImage image) {
     std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
     
     if (sourceName == "cam330") {
-        img_cam330->setPixmap(QPixmap::fromImage(image).scaled(
-        img_cam330->size(), Qt::KeepAspectRatio));
+        img_cam330->setFrame(image);
         
         double elapsed = std::chrono::duration<double, std::milli>(now - time_last_save_cam330).count();
 
@@ -164,8 +171,7 @@ void MainWindow::onNewFrame(QString sourceName, QImage image) {
         }
     }
     else if (sourceName == "cam310") {
-        img_cam310->setPixmap(QPixmap::fromImage(image).scaled(
-        img_cam310->size(), Qt::KeepAspectRatio));
+        img_cam310->setFrame(image);
 
         double elapsed = std::chrono::duration<double, std::milli>(now - time_last_save_cam310).count();
         if (save_images && (elapsed >= time_between_save_ms)) {
