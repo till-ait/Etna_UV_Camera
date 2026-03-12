@@ -12,6 +12,8 @@ CamView::CamView(QWidget *parent) : QLabel(parent) {
     
     last_img_width = 0;
     last_img_heigh = 0;
+
+    is_recorded = false;
 }
 
 void CamView::setFrame(const QImage &img) {
@@ -82,6 +84,10 @@ void CamView::paintEvent(QPaintEvent *event) {
     painter.drawLine(x + gapSize,   y, x + crossSize, y);
     painter.drawLine(x, y - crossSize, x, y - gapSize);
     painter.drawLine(x, y + gapSize,   x, y + crossSize);
+
+    if(is_recorded) {
+        painter.drawText(width()/2 - 11, 12, "Rec ●");
+    }
 }
 
 void CamView::mousePressEvent(QMouseEvent *event) {
@@ -130,4 +136,13 @@ int CamView::GetImgHeigh() {
 
 QImage CamView::getLastImage(){
     return last_image;
+}
+
+bool CamView::Is_recorded() {
+    return is_recorded;
+}
+
+void CamView::Set_is_reccorded(bool value) {
+    is_recorded = value;
+    update();
 }

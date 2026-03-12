@@ -182,7 +182,7 @@ void CameraControler::Acquire_Images() {
 
         if (!lOperationResult.IsOK()){
             stream->QueueBuffer( lBuffer );
-            appManager_->Get_UserInterface()->Ui_Print("Err : Fail operqtion while recive buffer.");
+            appManager_->Get_UserInterface()->Ui_Print("Err : Fail operation while recive buffer.");
             continue;
         }
 

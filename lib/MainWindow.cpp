@@ -17,6 +17,8 @@ MainWindow::MainWindow(AppManager* appManager, QWidget *parent)
     time_last_save_cam330 = std::chrono::steady_clock::now();
     time_last_save_cam310 = std::chrono::steady_clock::now();
     save_folder = "";
+    image_cam330_counter = 0;
+    image_cam310_counter = 0;
 
     //// LAYOUT ////
 
@@ -43,28 +45,30 @@ MainWindow::MainWindow(AppManager* appManager, QWidget *parent)
     btn_connect_cam330 = new QPushButton("Connect cam330");
     btn_connect_cam310 = new QPushButton("Connect cam310");
     btn_select_save_folder = new QPushButton("Select save folder");
-    btn_save_images = new QPushButton("Save Images");
-    label_periode = new QLabel("Time between save :");
+    btn_save_images = new QPushButton("Start Rec");
+    label_periode = new QLabel("Acquire Timing :");
     spin_periode = new QSpinBox();
     spin_periode->setMinimum(63);
     spin_periode->setMaximum(1000000);
     spin_periode->setSuffix(" ms");
-    btn_recenter_cross = new QPushButton("Recenter cross");
+    btn_recenter_cross = new QPushButton("Recenter crosses");
     btn_align_crosses = new QPushButton("Align crosses");
-    btn_reset_images = new QPushButton("Reset images");
+    btn_reset_images = new QPushButton("Cancel alignment");
     btn_exit = new QPushButton("Exit");
+    counter_image_rec = new QLabel("Acquire counter : ");
 
     CamBtLayout->addWidget(btn_connect_cam330);
     CamBtLayout->addWidget(btn_connect_cam310);
+    CamBtLayout->addWidget(btn_recenter_cross);
+    CamBtLayout->addWidget(btn_align_crosses);
+    CamBtLayout->addWidget(btn_reset_images);
     CamBtLayout->addWidget(btn_select_save_folder);
     CamBtLayout->addWidget(label_periode);
     CamBtLayout->addWidget(spin_periode);
     CamBtLayout->addWidget(btn_save_images);
-    CamBtLayout->addWidget(btn_recenter_cross);
-    CamBtLayout->addWidget(btn_align_crosses);
-    CamBtLayout->addWidget(btn_reset_images);
     CamBtLayout->addWidget(btn_exit);
     CamBtLayout->addStretch();
+    CamBtLayout->addWidget(counter_image_rec);
     group_cameras_control->setLayout(CamBtLayout);
     CamLayout->addWidget(group_cameras_control, CAMBTLAYOUT_STRENGTH);
 
@@ -161,13 +165,16 @@ void MainWindow::onNewFrame(QString sourceName, QImage image) {
         double elapsed = std::chrono::duration<double, std::milli>(now - time_last_save_cam330).count();
 
         if (save_images && (elapsed >= time_between_save_ms)) {
+            image_cam330_counter++;
             QString filename = save_folder + 
                     QDateTime::currentDateTime().toString("yyyyMMdd_hhmmss_zzz") 
-                    + "_" + sourceName + ".png";
+                    + "_" + sourceName + "_"+ QString::number(image_cam330_counter) + ".png";
             
             QImage imageCopy = img_cam310->getLastImage();
             QString filenameCopy = filename;
             std::thread([imageCopy, filenameCopy]() {imageCopy.save(filenameCopy);}).detach();
+
+            counter_image_rec->setText("Acquire counter : " + QString::number(image_cam330_counter));
 
             time_last_save_cam330 = std::chrono::steady_clock::now();
         }
@@ -177,9 +184,10 @@ void MainWindow::onNewFrame(QString sourceName, QImage image) {
 
         double elapsed = std::chrono::duration<double, std::milli>(now - time_last_save_cam310).count();
         if (save_images && (elapsed >= time_between_save_ms)) {
+            image_cam310_counter++;
             QString filename = save_folder + 
                     QDateTime::currentDateTime().toString("yyyyMMdd_hhmmss_zzz") 
-                    + "_" + sourceName + ".png";
+                    + "_" + sourceName + "_"+ QString::number(image_cam310_counter) + ".png";
             
             QImage imageCopy = img_cam310->getLastImage();
             QString filenameCopy = filename;
@@ -210,11 +218,19 @@ void MainWindow::Save_images_activation(){
 
     if(save_images){
         save_images = false;
-        btn_save_images->setText("Save Images");
+        btn_save_images->setText("Start Rec");
+        img_cam330->Set_is_reccorded(false);
+        img_cam310->Set_is_reccorded(false);
     }
     else if (save_folder != ""){
         save_images = true;
-        btn_save_images->setText("Stop Save");
+        btn_save_images->setText("Stop Rec");
+        
+        image_cam330_counter = 0;
+        image_cam310_counter = 0;
+
+        img_cam330->Set_is_reccorded(true);
+        img_cam310->Set_is_reccorded(true);
     }
 }
 

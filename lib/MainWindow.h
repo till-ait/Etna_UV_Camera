@@ -68,6 +68,7 @@ private:
     QPushButton *btn_recenter_cross;
     QPushButton *btn_align_crosses;
     QPushButton *btn_reset_images;
+    QLabel *counter_image_rec;
     QPushButton *btn_exit;
 
     QVBoxLayout *layout_cam330;
@@ -84,6 +85,9 @@ private:
 
     void Save_images_activation();
     void align_crosses();
+
+    int image_cam330_counter;
+    int image_cam310_counter;
 };
 
 #endif

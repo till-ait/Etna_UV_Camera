@@ -19,6 +19,8 @@ public:
     int GetImgWidth();
     int GetImgHeigh();
     QImage getLastImage();
+    bool Is_recorded();
+    void Set_is_reccorded(bool value);
 
 protected:
     void paintEvent(QPaintEvent *event) override;
@@ -46,6 +48,8 @@ private:
     QRect displayed_rect_;
 
     QImage last_image;
+
+    bool is_recorded;
 };
 
 #endif
