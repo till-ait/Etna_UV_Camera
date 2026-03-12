@@ -13,7 +13,12 @@ public:
     void setFrame(const QImage &img);
     QPoint getOffsetFromCenter() const;
     QPointF getOffsetNormalized() const;
+    QPoint getOffsetInImagePixels() const;
     void RecenterCross();
+    void Set_Offset(int _left_offset, int _right_offset, int _top_offset, int _bottom_offset);
+    int GetImgWidth();
+    int GetImgHeigh();
+    QImage getLastImage();
 
 protected:
     void paintEvent(QPaintEvent *event) override;
@@ -29,6 +34,18 @@ private:
     QPoint crossPos;
     QPoint dragOffset;
     bool dragging = false;
+
+    int left_offset;
+    int right_offset;
+    int top_offset;
+    int bottom_offset;
+
+    int last_img_width;
+    int last_img_heigh;
+
+    QRect displayed_rect_;
+
+    QImage last_image;
 };
 
 #endif

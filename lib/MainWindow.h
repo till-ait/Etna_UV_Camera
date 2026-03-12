@@ -14,13 +14,13 @@
 
 #define DEFAULT_PERIODE 10000
 
-#define CAMLAYOUT_STRENGTH 2
+#define CAMLAYOUT_STRENGTH 4
 #define SPECTROMETERLAYOUT_STRENGTH 1
 #define CAMBTLAYOUT_STRENGTH 1
 #define VIDEOLAYOUT_STRENGTH 5
 
-#define VIDEO_WIDTH 250 
-#define VIDEO_HEIGH 250
+#define VIDEO_WIDTH 50 
+#define VIDEO_HEIGH 50
 
 
 class AppManager;
@@ -66,6 +66,8 @@ private:
     QLabel *label_periode;
     QSpinBox *spin_periode;
     QPushButton *btn_recenter_cross;
+    QPushButton *btn_align_crosses;
+    QPushButton *btn_reset_images;
     QPushButton *btn_exit;
 
     QVBoxLayout *layout_cam330;
@@ -79,6 +81,9 @@ private:
     QGroupBox *group_cam330;
     QGroupBox *group_cam310;
     QGroupBox *group_spectrometer;
+
+    void Save_images_activation();
+    void align_crosses();
 };
 
 #endif
