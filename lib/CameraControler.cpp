@@ -27,6 +27,8 @@ CameraControler::CameraControler(AppManager* _appManager_, std::string name, std
     data.is_streaming = false;
     data.is_recording = false;
     data.fps = DEFAULT_FPS;
+    data.exposure_time = DEFAULT_EXPOSURE_TIME;
+    data.gain = 3.0;
 
     pv_result = new PvResult();
     buffer_list = new std::list<PvBuffer *>();
@@ -96,6 +98,8 @@ bool CameraControler::Try_Connection() {
     device_GEV->SetStreamDestination( stream_GEV->GetLocalIPAddress(), stream_GEV->GetLocalPort() );
     
     data.is_connected = true;
+    Set_Exposure_Time(data.exposure_time);
+    
     return result;
 }
 
@@ -187,9 +191,27 @@ void CameraControler::Acquire_Images() {
         }
 
         if(lBuffer->GetPayloadType() ==  PvPayloadTypeImage) {
+            std::lock_guard<std::mutex> guard(data_gain_mutex);
+
             uint8_t *data   = lBuffer->GetImage()->GetDataPointer();
             uint32_t width  = lBuffer->GetImage()->GetWidth();
             uint32_t height = lBuffer->GetImage()->GetHeight();
+
+            if(this->data.gain == 0.0) {
+                this->data.gain = 0.001;
+            }
+
+            uint32_t length = width*height;
+
+            for(int i=0; i<length; i++){
+                uint32_t new_data = data[i] * this->data.gain;
+                if(new_data <= 255) {
+                    data[i] = new_data;
+                }
+                else {
+                    data[i] = 255;
+                }
+            }
 
             // new OutputPackage(appManager_, new std::string("IMAGE RECIVED"));
             // new OutputPackage(appManager_, new std::string(this->data.name), data, width, height);
@@ -277,4 +299,39 @@ void CameraControler::Print_Param() {
         // afficher nom et type
         std::cout << name.GetAscii() << std::endl;
     }
+}
+
+float CameraControler::getGain() {
+    return data.gain;
+}
+
+void CameraControler::setGain(float value) {
+    std::lock_guard<std::mutex> guard(data_gain_mutex);
+
+    if(value >= 0) {
+        data.gain = value;
+    }
+    else {
+        data.gain = value * (-1.0);
+    }
+}
+
+void CameraControler::Set_Exposure_Time(int value) {
+    if((value < MIN_EXPOSURE_TIME) || (value > MAX_EXPOSURE_TIME)) {
+        appManager_->Get_UserInterface()->Ui_Print("Err : Exposure time out of range");
+        return;
+    }
+
+    data.exposure_time = value;
+
+    if (!data.is_connected || device == nullptr) {
+        return;
+    }
+
+    PvGenParameterArray *params = device->GetParameters();
+
+    PvGenFloat *lFPS = dynamic_cast<PvGenFloat *>(
+        params->Get("ExposureTime")
+    );
+    if (lFPS) lFPS->SetValue((float)data.exposure_time);
 }

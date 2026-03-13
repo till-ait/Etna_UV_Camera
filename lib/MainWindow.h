@@ -10,9 +10,11 @@
 #include <QMessageBox>
 #include <QSpinBox>
 #include <QGroupBox>
+#include <QSlider>
 #include <string>
 
 #define DEFAULT_PERIODE 10000
+#define MIN_ACQUIRE_TIME 2000    // 63
 
 #define CAMLAYOUT_STRENGTH 4
 #define SPECTROMETERLAYOUT_STRENGTH 1
@@ -69,6 +71,12 @@ private:
     QPushButton *btn_align_crosses;
     QPushButton *btn_reset_images;
     QLabel *counter_image_rec;
+    QLabel *label_exposure_time;
+    QSlider *slider_exposure_time;
+    QLabel *label_gain;
+    QSlider *slider_gain;
+    QLabel *label_diff_gain;
+    QSlider *slider_diff_gain;
     QPushButton *btn_exit;
 
     QVBoxLayout *layout_cam330;
@@ -85,9 +93,13 @@ private:
 
     void Save_images_activation();
     void align_crosses();
+    void update_gain();
 
     int image_cam330_counter;
     int image_cam310_counter;
+
+    float master_gain;
+    float diff_gain;
 };
 
 #endif

@@ -7,6 +7,7 @@
 #include <QPainter>
 #include <thread>
 #include "CamView.h"
+#include "CameraControler.h"
 
 #include <iostream>
 
@@ -19,6 +20,9 @@ MainWindow::MainWindow(AppManager* appManager, QWidget *parent)
     save_folder = "";
     image_cam330_counter = 0;
     image_cam310_counter = 0;
+
+    master_gain = 1.0;
+    diff_gain = 0.0;
 
     //// LAYOUT ////
 
@@ -48,13 +52,34 @@ MainWindow::MainWindow(AppManager* appManager, QWidget *parent)
     btn_save_images = new QPushButton("Start Rec");
     label_periode = new QLabel("Acquire Timing :");
     spin_periode = new QSpinBox();
-    spin_periode->setMinimum(63);
+    spin_periode->setMinimum(MIN_ACQUIRE_TIME);
     spin_periode->setMaximum(1000000);
     spin_periode->setSuffix(" ms");
     btn_recenter_cross = new QPushButton("Recenter crosses");
     btn_align_crosses = new QPushButton("Align crosses");
     btn_reset_images = new QPushButton("Cancel alignment");
     btn_exit = new QPushButton("Exit");
+    label_exposure_time = new QLabel("Time Exposure :");
+    slider_exposure_time = new QSlider(Qt::Horizontal);
+    slider_exposure_time->setMinimum(MIN_EXPOSURE_TIME);
+    slider_exposure_time->setMaximum(MAX_EXPOSURE_TIME/2);
+    slider_exposure_time->setValue(DEFAULT_EXPOSURE_TIME);
+    slider_exposure_time->setSingleStep(25);
+    slider_exposure_time->setPageStep(25);
+    label_gain = new QLabel("Master Gain :");
+    slider_gain = new QSlider(Qt::Horizontal);
+    slider_gain->setMinimum(0);
+    slider_gain->setMaximum(100);
+    slider_gain->setValue(50);
+    slider_gain->setSingleStep(1);
+    slider_gain->setPageStep(1);
+    label_diff_gain = new QLabel("diff Gain :");
+    slider_diff_gain = new QSlider(Qt::Horizontal);
+    slider_diff_gain->setMinimum(0);
+    slider_diff_gain->setMaximum(100);
+    slider_diff_gain->setValue(50);
+    slider_diff_gain->setSingleStep(1);
+    slider_diff_gain->setPageStep(1);
     counter_image_rec = new QLabel("Acquire counter : ");
 
     CamBtLayout->addWidget(btn_connect_cam330);
@@ -62,10 +87,16 @@ MainWindow::MainWindow(AppManager* appManager, QWidget *parent)
     CamBtLayout->addWidget(btn_recenter_cross);
     CamBtLayout->addWidget(btn_align_crosses);
     CamBtLayout->addWidget(btn_reset_images);
-    CamBtLayout->addWidget(btn_select_save_folder);
+    // CamBtLayout->addWidget(btn_select_save_folder);
     CamBtLayout->addWidget(label_periode);
     CamBtLayout->addWidget(spin_periode);
     CamBtLayout->addWidget(btn_save_images);
+    CamBtLayout->addWidget(label_exposure_time);
+    CamBtLayout->addWidget(slider_exposure_time);
+    CamBtLayout->addWidget(label_gain);
+    CamBtLayout->addWidget(slider_gain);
+    CamBtLayout->addWidget(label_diff_gain);
+    CamBtLayout->addWidget(slider_diff_gain);
     CamBtLayout->addWidget(btn_exit);
     CamBtLayout->addStretch();
     CamBtLayout->addWidget(counter_image_rec);
@@ -153,6 +184,23 @@ MainWindow::MainWindow(AppManager* appManager, QWidget *parent)
     QObject::connect(spin_periode, &QSpinBox::valueChanged, [&](long value) {
         Set_Time_between_save(value);
     });
+
+    QObject::connect(slider_exposure_time, &QSlider::valueChanged, [&](int value) {
+        std::vector<CameraControler*>* cameras = appManager_->Get_Cameras();
+
+        cameras->at(0)->Set_Exposure_Time(value);
+        cameras->at(1)->Set_Exposure_Time(value);
+    });
+
+    QObject::connect(slider_gain, &QSlider::valueChanged, [&](int value) {
+        master_gain = (value)/10.0;
+        update_gain();
+    });
+
+    QObject::connect(slider_diff_gain, &QSlider::valueChanged, [&](int value) {
+        diff_gain = ((value-50)/10.0);
+        update_gain();
+    });
 }
 
 
@@ -210,19 +258,21 @@ void MainWindow::Set_Time_between_save(long value) {
 
 
 void MainWindow::Save_images_activation(){
-    if(save_folder == ""){
-        printQt("No destination folder selected.");
-        QString folder = QFileDialog::getExistingDirectory(this, "Select a folder", "C:/", QFileDialog::ShowDirsOnly);
-        if (!folder.isEmpty()) save_folder = folder + "/";
-    }
-
     if(save_images){
         save_images = false;
         btn_save_images->setText("Start Rec");
         img_cam330->Set_is_reccorded(false);
         img_cam310->Set_is_reccorded(false);
     }
-    else if (save_folder != ""){
+    else {
+        QString folder = QFileDialog::getExistingDirectory(this, "Select a folder", "C:/", QFileDialog::ShowDirsOnly);
+        if (!folder.isEmpty()) {
+            save_folder = folder + "/";
+        }
+        else {
+            return;
+        }
+
         save_images = true;
         btn_save_images->setText("Stop Rec");
         
@@ -311,4 +361,19 @@ void MainWindow::align_crosses() {
 
         img_cam330->RecenterCross();
         img_cam310->RecenterCross();
+}
+
+void MainWindow::update_gain() {
+    std::vector<CameraControler*>* cameras = appManager_->Get_Cameras();
+    
+    if(diff_gain < 0) {
+        cameras->at(0)->setGain(master_gain - diff_gain);
+        cameras->at(1)->setGain(master_gain);
+    }
+    else {
+        cameras->at(0)->setGain(master_gain);
+        cameras->at(1)->setGain(master_gain + diff_gain);
+    }
+
+    
 }
