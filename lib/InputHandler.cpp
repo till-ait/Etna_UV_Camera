@@ -61,7 +61,6 @@ std::vector<std::string> InputHandler::split(const std::string& str) {
 }
 
 void InputHandler::exit_cmd(){
-    // new OutputPackage(appManager_, new std::string("Terminate Threads... "));
     appManager_->Get_UserInterface()->Ui_Print("Terminate Threads... ");
     appManager_->Set_Is_Running(false);
 }

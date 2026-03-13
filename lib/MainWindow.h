@@ -38,7 +38,6 @@ public:
     void Set_Time_between_save(long value);
 
 public slots:
-    // Appelé depuis le thread principal quand une image arrive
     void onNewFrame(QString sourceName, QImage image);
     void printQt(QString msg);
 

@@ -9,7 +9,6 @@ template<typename T>
 class ThreadSecureQueue {
 public:
     ThreadSecureQueue() = default;
-    // Désactive la copie
     ThreadSecureQueue(const ThreadSecureQueue&) = delete;
     ThreadSecureQueue& operator=(const ThreadSecureQueue&) = delete;
 

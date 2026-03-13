@@ -42,8 +42,6 @@ MainWindow::MainWindow(AppManager* appManager, QWidget *parent)
     layout_cam310 = new QVBoxLayout();
     group_cam310 = new QGroupBox("Cameras 310 nm");
     group_spectrometer = new QGroupBox("Spectrometer");
-    
-    // TODO : il faut ajouter les differents bouton et les different layout
 
     CamLayout->setContentsMargins(0, 0, 0, 0);
     btn_connect_cam330 = new QPushButton("Connect cam330");
@@ -87,7 +85,6 @@ MainWindow::MainWindow(AppManager* appManager, QWidget *parent)
     CamBtLayout->addWidget(btn_recenter_cross);
     CamBtLayout->addWidget(btn_align_crosses);
     CamBtLayout->addWidget(btn_reset_images);
-    // CamBtLayout->addWidget(btn_select_save_folder);
     CamBtLayout->addWidget(label_periode);
     CamBtLayout->addWidget(spin_periode);
     CamBtLayout->addWidget(btn_save_images);
@@ -116,8 +113,6 @@ MainWindow::MainWindow(AppManager* appManager, QWidget *parent)
     layout_cam310->addWidget(img_cam310);
     group_cam310->setLayout(layout_cam310);
     CamVideoLayout->addWidget(group_cam310);
-    // CamVideoLayout->addWidget(img_cam310);
-    // CamVideoLayout->addStretch();
     CamLayout->addLayout(CamVideoLayout, VIDEOLAYOUT_STRENGTH);
     
     SpectrometerLayout->setContentsMargins(0, 0, 0, 0);

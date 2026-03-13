@@ -113,16 +113,12 @@ void CameraControler::Create_Stream_Buffers()
     stream->GetQueuedBufferMaximum() :
     BUFFER_COUNT;
     
-    // Allocate buffers
     for ( uint32_t i = 0; i < buffer_count; i++ )
     {
-        // Create new buffer object
         PvBuffer *buffer = new PvBuffer;
         
-        // Have the new buffer object allocate payload memory
         buffer->Alloc( static_cast<uint32_t>( lSize ) );
         
-        // Add to external list - used to eventually release the buffers
         buffer_list->push_back( buffer );
     }
     
@@ -137,7 +133,6 @@ void CameraControler::Create_Stream_Buffers()
 
 void CameraControler::Free_Stream_Buffers()
 {
-    // Go through the buffer list
     std::list<PvBuffer *>::iterator lIt = buffer_list->begin();
     while ( lIt != buffer_list->end() )
     {
@@ -145,7 +140,6 @@ void CameraControler::Free_Stream_Buffers()
         lIt++;
     }
 
-    // Clear the buffer list 
     buffer_list->clear();
 }
 
@@ -213,8 +207,6 @@ void CameraControler::Acquire_Images() {
                 }
             }
 
-            // new OutputPackage(appManager_, new std::string("IMAGE RECIVED"));
-            // new OutputPackage(appManager_, new std::string(this->data.name), data, width, height);
             appManager_->Get_UserInterface()->Push_Frame(new std::string(this->data.name), data, width, height);
         }
         else {
@@ -296,7 +288,6 @@ void CameraControler::Print_Param() {
         param->GetName(name);
         
         PvString type;
-        // afficher nom et type
         std::cout << name.GetAscii() << std::endl;
     }
 }
