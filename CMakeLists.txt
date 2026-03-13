@@ -6,6 +6,10 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_PREFIX_PATH "C:\\Qt\\6.10.2\\msvc2022_64")
+find_package(Qt6 REQUIRED COMPONENTS Widgets)
+
 set(EBUS_INCLUDE_DIR "C:/Program Files/JAI/eBUS SDK/Includes")
 set(EBUS_LIB_DIR     "C:/Program Files/JAI/eBUS SDK/Libraries")
 

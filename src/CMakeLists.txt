@@ -11,15 +11,19 @@ target_link_libraries(Etna_UV_Camera PRIVATE
     OutputPackage
     ThreadSecureQueue
     CmdUi
+    QtUi
     InputHandler
     gdi32
     UvcamDisplay
     hal_UV_Cam2
     CameraControler
+    MainWindow
+    CamView
     PvDevice64.lib
     PvStream64.lib
     PvBase64.lib
     PvBuffer64.lib
+    Qt6::Widgets
 )
 
 target_compile_options(Etna_UV_Camera PRIVATE /EHsc)

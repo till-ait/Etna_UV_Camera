@@ -16,6 +16,9 @@ add_library(ThreadSecureQueue
 add_library(CmdUi
             CmdUi.cpp)
 
+add_library(QtUi
+            QtUi.cpp)
+
 add_library(InputHandler
             InputHandler.cpp)
 
@@ -28,6 +31,12 @@ add_library(hal_UV_Cam2
 add_library(CameraControler
             CameraControler.cpp)
 
+add_library(MainWindow
+            MainWindow.cpp)
+
+add_library(CamView
+            CamView.cpp)
+
 target_include_directories(hal_UV_Cam PUBLIC 
                             ${CMAKE_CURRENT_SOURCE_DIR}
                             ${EBUS_INCLUDE_DIR})
@@ -39,6 +48,7 @@ target_include_directories(AppManager PUBLIC
                             ${EBUS_INCLUDE_DIR})
 
 target_link_directories(AppManager PUBLIC ${EBUS_LIB_DIR})
+target_link_libraries(AppManager PUBLIC Qt6::Widgets)
 
 target_include_directories(UserInterface PUBLIC 
                             ${CMAKE_CURRENT_SOURCE_DIR})
@@ -51,6 +61,21 @@ target_include_directories(ThreadSecureQueue PUBLIC
                             
 target_include_directories(CmdUi PUBLIC 
                             ${CMAKE_CURRENT_SOURCE_DIR})
+                            
+target_include_directories(QtUi PUBLIC 
+                            ${CMAKE_CURRENT_SOURCE_DIR})
+
+target_link_libraries(QtUi PUBLIC Qt6::Widgets)                            
+                            
+target_include_directories(MainWindow PUBLIC 
+                            ${CMAKE_CURRENT_SOURCE_DIR})
+
+target_link_libraries(MainWindow PUBLIC Qt6::Widgets)                            
+                            
+target_include_directories(CamView PUBLIC 
+                            ${CMAKE_CURRENT_SOURCE_DIR})
+
+target_link_libraries(CamView PUBLIC Qt6::Widgets)                            
                             
 target_include_directories(InputHandler PUBLIC 
                             ${CMAKE_CURRENT_SOURCE_DIR})

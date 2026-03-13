@@ -1,6 +1,7 @@
 #include "CameraControler.h"
 #include "ThreadSecureQueue.h"
 #include "OutputPackage.h"
+#include "UserInterface.h"
 
 #include <PvSampleUtils.h>
 #include <PvSystem.h>
@@ -26,6 +27,8 @@ CameraControler::CameraControler(AppManager* _appManager_, std::string name, std
     data.is_streaming = false;
     data.is_recording = false;
     data.fps = DEFAULT_FPS;
+    data.exposure_time = DEFAULT_EXPOSURE_TIME;
+    data.gain = 3.0;
 
     pv_result = new PvResult();
     buffer_list = new std::list<PvBuffer *>();
@@ -65,27 +68,27 @@ bool CameraControler::Try_Connection() {
     device = PvDevice::CreateAndConnect( deviceID, pv_result);
 
     if(device == NULL) {
-        new OutputPackage(appManager_, new std::string("Err : can't connect"));
+        appManager_->Get_UserInterface()->Ui_Print("Err : can't connect");
         return result = false;
     }
     stream = PvStream::CreateAndOpen( deviceID, pv_result);
     
     if(stream == NULL) {
-        new OutputPackage(appManager_, new std::string("Err : can't open stream"));
+        appManager_->Get_UserInterface()->Ui_Print("Err : can't open stream");
         return result = false;
     }
     
     device_GEV = dynamic_cast<PvDeviceGEV *>( device );
     
     if(device_GEV == NULL) {
-        new OutputPackage(appManager_, new std::string("Err : can't connect with GEV"));
+        appManager_->Get_UserInterface()->Ui_Print("Err : can't connect with GEV");
         return result = false;
     }
     
     PvStreamGEV *stream_GEV = static_cast<PvStreamGEV *>( stream );
     
     if(stream_GEV == NULL) {
-        new OutputPackage(appManager_, new std::string("Err : can't open GEV stream"));
+        appManager_->Get_UserInterface()->Ui_Print("Err : can't open GEV stream");
         return result = false;
     }
     
@@ -95,6 +98,8 @@ bool CameraControler::Try_Connection() {
     device_GEV->SetStreamDestination( stream_GEV->GetLocalIPAddress(), stream_GEV->GetLocalPort() );
     
     data.is_connected = true;
+    Set_Exposure_Time(data.exposure_time);
+    
     return result;
 }
 
@@ -108,16 +113,12 @@ void CameraControler::Create_Stream_Buffers()
     stream->GetQueuedBufferMaximum() :
     BUFFER_COUNT;
     
-    // Allocate buffers
     for ( uint32_t i = 0; i < buffer_count; i++ )
     {
-        // Create new buffer object
         PvBuffer *buffer = new PvBuffer;
         
-        // Have the new buffer object allocate payload memory
         buffer->Alloc( static_cast<uint32_t>( lSize ) );
         
-        // Add to external list - used to eventually release the buffers
         buffer_list->push_back( buffer );
     }
     
@@ -132,7 +133,6 @@ void CameraControler::Create_Stream_Buffers()
 
 void CameraControler::Free_Stream_Buffers()
 {
-    // Go through the buffer list
     std::list<PvBuffer *>::iterator lIt = buffer_list->begin();
     while ( lIt != buffer_list->end() )
     {
@@ -140,7 +140,6 @@ void CameraControler::Free_Stream_Buffers()
         lIt++;
     }
 
-    // Clear the buffer list 
     buffer_list->clear();
 }
 
@@ -175,26 +174,43 @@ void CameraControler::Acquire_Images() {
         PvResult lResult = stream->RetrieveBuffer( &lBuffer, &lOperationResult, 1000 );
 
         if (!lResult.IsOK()){
-            new OutputPackage(appManager_, new std::string("Err : Fail to recive buffer."));
+            appManager_->Get_UserInterface()->Ui_Print("Err : Fail to recive buffer.");
             continue;
         }
 
         if (!lOperationResult.IsOK()){
             stream->QueueBuffer( lBuffer );
-            new OutputPackage(appManager_, new std::string("Err : Fail operqtion while recive buffer."));
+            appManager_->Get_UserInterface()->Ui_Print("Err : Fail operation while recive buffer.");
             continue;
         }
 
         if(lBuffer->GetPayloadType() ==  PvPayloadTypeImage) {
+            std::lock_guard<std::mutex> guard(data_gain_mutex);
+
             uint8_t *data   = lBuffer->GetImage()->GetDataPointer();
             uint32_t width  = lBuffer->GetImage()->GetWidth();
             uint32_t height = lBuffer->GetImage()->GetHeight();
 
-            // new OutputPackage(appManager_, new std::string("IMAGE RECIVED"));
-            new OutputPackage(appManager_, new std::string(this->data.name), data, width, height);
+            if(this->data.gain == 0.0) {
+                this->data.gain = 0.001;
+            }
+
+            uint32_t length = width*height;
+
+            for(int i=0; i<length; i++){
+                uint32_t new_data = data[i] * this->data.gain;
+                if(new_data <= 255) {
+                    data[i] = new_data;
+                }
+                else {
+                    data[i] = 255;
+                }
+            }
+
+            appManager_->Get_UserInterface()->Push_Frame(new std::string(this->data.name), data, width, height);
         }
         else {
-            new OutputPackage(appManager_, new std::string("Err : PayloadType not supported."));
+            appManager_->Get_UserInterface()->Ui_Print("Err : PayloadType not supported.");
         }
 
         stream->QueueBuffer( lBuffer );
@@ -238,7 +254,7 @@ void CameraControler::Set_Fps(int _fps){
 
 void CameraControler::Send_Fps() {
     if (!data.is_connected || device == nullptr) {
-        new OutputPackage(appManager_, new std::string("Err : Device not connected, impossible to send fps."));
+        appManager_->Get_UserInterface()->Ui_Print("Err : Device not connected, impossible to send fps.");
         return;
     }
 
@@ -272,7 +288,41 @@ void CameraControler::Print_Param() {
         param->GetName(name);
         
         PvString type;
-        // afficher nom et type
         std::cout << name.GetAscii() << std::endl;
     }
+}
+
+float CameraControler::getGain() {
+    return data.gain;
+}
+
+void CameraControler::setGain(float value) {
+    std::lock_guard<std::mutex> guard(data_gain_mutex);
+
+    if(value >= 0) {
+        data.gain = value;
+    }
+    else {
+        data.gain = value * (-1.0);
+    }
+}
+
+void CameraControler::Set_Exposure_Time(int value) {
+    if((value < MIN_EXPOSURE_TIME) || (value > MAX_EXPOSURE_TIME)) {
+        appManager_->Get_UserInterface()->Ui_Print("Err : Exposure time out of range");
+        return;
+    }
+
+    data.exposure_time = value;
+
+    if (!data.is_connected || device == nullptr) {
+        return;
+    }
+
+    PvGenParameterArray *params = device->GetParameters();
+
+    PvGenFloat *lFPS = dynamic_cast<PvGenFloat *>(
+        params->Get("ExposureTime")
+    );
+    if (lFPS) lFPS->SetValue((float)data.exposure_time);
 }

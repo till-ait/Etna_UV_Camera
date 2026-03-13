@@ -7,8 +7,6 @@
 #include <thread>
 #include <memory>
 #include <atomic>
-// #include "UserInterface.h"
-// #include "CmdUi.h"
 
 class UserInterface;
 class InputHandler;
@@ -16,6 +14,7 @@ class CameraControler;
 
 class AppManager {
 public :
+    AppManager();
     AppManager(char** argv);
     ~AppManager();
     

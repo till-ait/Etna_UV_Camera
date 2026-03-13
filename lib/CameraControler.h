@@ -11,10 +11,15 @@
 #include <vector>
 #include <list>
 #include <thread>
+#include <mutex>
 
 
 #define DEFAULT_FPS 16
 #define BUFFER_COUNT ( 16 )
+
+#define MIN_EXPOSURE_TIME 118
+#define MAX_EXPOSURE_TIME 61967
+#define DEFAULT_EXPOSURE_TIME 31000
 
 class AppManager;
 class OutputPackage;
@@ -32,6 +37,8 @@ struct s_camera_data {
     bool is_streaming;
     bool is_recording;
     int fps;
+    int exposure_time;
+    float gain;
 };
 
 class CameraControler {
@@ -54,7 +61,12 @@ public :
 
     int Get_Fps();
     void Set_Fps(int _fps);
-    
+
+    float getGain();
+    void setGain(float value);
+
+    void Set_Exposure_Time(int value);
+
 private :
     AppManager* appManager_;
     s_camera_data data;
@@ -65,6 +77,7 @@ private :
     PvStreamGEV* stream_GEV;
     std::list<PvBuffer *>* buffer_list;
     std::thread* thread_acquire;
+    std::mutex data_gain_mutex;
 
     void Create_Stream_Buffers();
     void Free_Stream_Buffers();
