@@ -33,6 +33,7 @@ MainWindow::MainWindow(AppManager* appManager, QWidget *parent)
     CamVideoLayout = new QVBoxLayout();
     
     SpectrometerLayout = new QHBoxLayout();
+    SpectrometerBtnLayout = new QVBoxLayout();
     SpectrometerBtLayout = new QVBoxLayout();
     SpectrometerVideoLayout = new QVBoxLayout();
 
@@ -94,9 +95,9 @@ MainWindow::MainWindow(AppManager* appManager, QWidget *parent)
     CamBtLayout->addWidget(slider_gain);
     CamBtLayout->addWidget(label_diff_gain);
     CamBtLayout->addWidget(slider_diff_gain);
-    CamBtLayout->addWidget(btn_exit);
     CamBtLayout->addStretch();
     CamBtLayout->addWidget(counter_image_rec);
+    CamBtLayout->addWidget(btn_exit);
     group_cameras_control->setLayout(CamBtLayout);
     CamLayout->addWidget(group_cameras_control, CAMBTLAYOUT_STRENGTH);
 
@@ -116,10 +117,21 @@ MainWindow::MainWindow(AppManager* appManager, QWidget *parent)
     CamLayout->addLayout(CamVideoLayout, VIDEOLAYOUT_STRENGTH);
     
     SpectrometerLayout->setContentsMargins(0, 0, 0, 0);
+    SpectrometerBtnLayout->setContentsMargins(10, 10, 10, 10);
     img_spectro = new QLabel("Spectro");
     img_spectro->setAlignment(Qt::AlignCenter);
     img_spectro->setMinimumSize(600, 100);
-    SpectrometerLayout->addWidget(img_spectro);  // TODO : Implement spectro layout
+    btn_connect_spectro = new QPushButton("Connect Spectro");
+    btn_acquire_spectro = new QPushButton("Start Acquire");
+    spin_spectro_gain = new QSpinBox();
+    spin_spectro_gain->setMinimum(MIN_ACQUIRE_TIME);
+    spin_spectro_gain->setMaximum(1000);
+    spin_spectro_gain->setSuffix(" dB");
+    SpectrometerBtnLayout->addWidget(btn_connect_spectro);
+    SpectrometerBtnLayout->addWidget(btn_acquire_spectro);
+    SpectrometerBtnLayout->addWidget(spin_spectro_gain);
+    SpectrometerLayout->addLayout(SpectrometerBtnLayout, CAMBTLAYOUT_STRENGTH);
+    SpectrometerLayout->addWidget(img_spectro);
         
     mainLayout->addLayout(CamLayout, CAMLAYOUT_STRENGTH);
 

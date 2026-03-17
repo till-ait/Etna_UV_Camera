@@ -57,6 +57,7 @@ private:
     QVBoxLayout *CamVideoLayout;
     
     QHBoxLayout *SpectrometerLayout;
+    QVBoxLayout *SpectrometerBtnLayout;
     QVBoxLayout *SpectrometerBtLayout;
     QVBoxLayout *SpectrometerVideoLayout;
 
@@ -77,6 +78,10 @@ private:
     QLabel *label_diff_gain;
     QSlider *slider_diff_gain;
     QPushButton *btn_exit;
+
+    QPushButton *btn_connect_spectro;
+    QPushButton *btn_acquire_spectro;
+    QSpinBox *spin_spectro_gain;
 
     QVBoxLayout *layout_cam330;
     QVBoxLayout *layout_cam310;
