@@ -11,6 +11,8 @@
 #include <QSpinBox>
 #include <QGroupBox>
 #include <QSlider>
+#include <QtCharts/QChartView>
+#include <QtCharts/QLineSeries>
 #include <string>
 
 #define DEFAULT_PERIODE 10000
@@ -82,6 +84,9 @@ private:
     QPushButton *btn_connect_spectro;
     QPushButton *btn_acquire_spectro;
     QSpinBox *spin_spectro_gain;
+    QLineSeries *series_spectro;
+    QChart *chart_spectro;
+    QChartView *chartView;
 
     QVBoxLayout *layout_cam330;
     QVBoxLayout *layout_cam310;

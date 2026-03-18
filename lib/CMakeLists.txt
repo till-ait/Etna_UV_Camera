@@ -70,12 +70,12 @@ target_link_libraries(QtUi PUBLIC Qt6::Widgets)
 target_include_directories(MainWindow PUBLIC 
                             ${CMAKE_CURRENT_SOURCE_DIR})
 
-target_link_libraries(MainWindow PUBLIC Qt6::Widgets)                            
+target_link_libraries(MainWindow PUBLIC Qt6::Widgets Qt6::Gui Qt6::Core Qt6::Charts)                            
                             
 target_include_directories(CamView PUBLIC 
                             ${CMAKE_CURRENT_SOURCE_DIR})
 
-target_link_libraries(CamView PUBLIC Qt6::Widgets)                            
+target_link_libraries(CamView PUBLIC Qt6::Widgets)                  
                             
 target_include_directories(InputHandler PUBLIC 
                             ${CMAKE_CURRENT_SOURCE_DIR})

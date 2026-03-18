@@ -127,11 +127,27 @@ MainWindow::MainWindow(AppManager* appManager, QWidget *parent)
     spin_spectro_gain->setMinimum(MIN_ACQUIRE_TIME);
     spin_spectro_gain->setMaximum(1000);
     spin_spectro_gain->setSuffix(" dB");
+    series_spectro = new QLineSeries();
+    series_spectro->append(0, 6);   // TODO : Replace by the true values
+    series_spectro->append(2, 4);
+    series_spectro->append(3, 8);
+    series_spectro->append(7, 4);
+    series_spectro->setPen(QPen(Qt::black, 2));
+    chart_spectro = new QChart();
+    chart_spectro->addSeries(series_spectro);
+    chart_spectro->createDefaultAxes();
+    // chart_spectro->setTitle("Spectre");
+    chart_spectro->legend()->hide();
+    chart_spectro->setMargins(QMargins(0, 0, 0, 0));
+    chart_spectro->setBackgroundRoundness(0);
+    chartView = new QChartView(chart_spectro);
+    chartView->setRenderHint(QPainter::Antialiasing);
     SpectrometerBtnLayout->addWidget(btn_connect_spectro);
     SpectrometerBtnLayout->addWidget(btn_acquire_spectro);
     SpectrometerBtnLayout->addWidget(spin_spectro_gain);
-    SpectrometerLayout->addLayout(SpectrometerBtnLayout, CAMBTLAYOUT_STRENGTH);
-    SpectrometerLayout->addWidget(img_spectro);
+    SpectrometerLayout->addLayout(SpectrometerBtnLayout, 1);
+    SpectrometerLayout->addWidget(chartView, 5);
+    // SpectrometerLayout->addWidget(img_spectro);
         
     mainLayout->addLayout(CamLayout, CAMLAYOUT_STRENGTH);
 
