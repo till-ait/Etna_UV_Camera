@@ -56,7 +56,7 @@ private:
 
     QHBoxLayout *CamLayout;
     QVBoxLayout *CamBtLayout;
-    QVBoxLayout *CamVideoLayout;
+    QHBoxLayout *CamVideoLayout;
     
     QHBoxLayout *SpectrometerLayout;
     QVBoxLayout *SpectrometerBtnLayout;

@@ -30,7 +30,7 @@ MainWindow::MainWindow(AppManager* appManager, QWidget *parent)
 
     CamLayout = new QHBoxLayout();
     CamBtLayout = new QVBoxLayout();
-    CamVideoLayout = new QVBoxLayout();
+    CamVideoLayout = new QHBoxLayout();
     
     SpectrometerLayout = new QHBoxLayout();
     SpectrometerBtnLayout = new QVBoxLayout();
