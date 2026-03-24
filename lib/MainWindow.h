@@ -13,6 +13,7 @@
 #include <QSlider>
 #include <QtCharts/QChartView>
 #include <QtCharts/QLineSeries>
+#include <QCheckBox>
 #include <string>
 
 #define DEFAULT_PERIODE 10000
@@ -79,6 +80,9 @@ private:
     QSlider *slider_gain;
     QLabel *label_diff_gain;
     QSlider *slider_diff_gain;
+    QCheckBox *checkBoxExposure;
+    QCheckBox *checkBoxMasterGain;
+    QCheckBox *checkBoxDiffGain;
     QPushButton *btn_exit;
 
     QPushButton *btn_connect_spectro;

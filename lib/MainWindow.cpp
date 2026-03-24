@@ -59,26 +59,32 @@ MainWindow::MainWindow(AppManager* appManager, QWidget *parent)
     btn_reset_images = new QPushButton("Cancel alignment");
     btn_exit = new QPushButton("Exit");
     label_exposure_time = new QLabel("Time Exposure :");
+    checkBoxExposure = new QCheckBox("Time Exposure :");
     slider_exposure_time = new QSlider(Qt::Horizontal);
     slider_exposure_time->setMinimum(MIN_EXPOSURE_TIME);
     slider_exposure_time->setMaximum(MAX_EXPOSURE_TIME/2);
     slider_exposure_time->setValue(DEFAULT_EXPOSURE_TIME);
     slider_exposure_time->setSingleStep(25);
     slider_exposure_time->setPageStep(25);
+    slider_exposure_time->setEnabled(false);
     label_gain = new QLabel("Master Gain :");
+    checkBoxMasterGain = new QCheckBox("Master Gain :");
     slider_gain = new QSlider(Qt::Horizontal);
     slider_gain->setMinimum(0);
     slider_gain->setMaximum(100);
     slider_gain->setValue(50);
     slider_gain->setSingleStep(1);
     slider_gain->setPageStep(1);
+    slider_gain->setEnabled(false);
     label_diff_gain = new QLabel("diff Gain :");
+    checkBoxDiffGain = new QCheckBox("Diff Gain :");
     slider_diff_gain = new QSlider(Qt::Horizontal);
     slider_diff_gain->setMinimum(0);
     slider_diff_gain->setMaximum(100);
     slider_diff_gain->setValue(50);
     slider_diff_gain->setSingleStep(1);
     slider_diff_gain->setPageStep(1);
+    slider_diff_gain->setEnabled(false);
     counter_image_rec = new QLabel("Acquire counter : ");
 
     CamBtLayout->addWidget(btn_connect_cam330);
@@ -89,11 +95,14 @@ MainWindow::MainWindow(AppManager* appManager, QWidget *parent)
     CamBtLayout->addWidget(label_periode);
     CamBtLayout->addWidget(spin_periode);
     CamBtLayout->addWidget(btn_save_images);
-    CamBtLayout->addWidget(label_exposure_time);
+    // CamBtLayout->addWidget(label_exposure_time);
+    CamBtLayout->addWidget(checkBoxExposure);
     CamBtLayout->addWidget(slider_exposure_time);
-    CamBtLayout->addWidget(label_gain);
+    // CamBtLayout->addWidget(label_gain);
+    CamBtLayout->addWidget(checkBoxMasterGain);
     CamBtLayout->addWidget(slider_gain);
-    CamBtLayout->addWidget(label_diff_gain);
+    // CamBtLayout->addWidget(label_diff_gain);
+    CamBtLayout->addWidget(checkBoxDiffGain);
     CamBtLayout->addWidget(slider_diff_gain);
     CamBtLayout->addStretch();
     CamBtLayout->addWidget(counter_image_rec);
@@ -223,6 +232,30 @@ MainWindow::MainWindow(AppManager* appManager, QWidget *parent)
     QObject::connect(slider_diff_gain, &QSlider::valueChanged, [&](int value) {
         diff_gain = ((value-50)/10.0);
         update_gain();
+    });
+
+    QObject::connect(checkBoxExposure, &QCheckBox::toggled, [&](bool checked) {
+        if (checked) {
+            slider_exposure_time->setEnabled(true);
+        } else {
+            slider_exposure_time->setEnabled(false);
+        }
+    });
+
+    QObject::connect(checkBoxMasterGain, &QCheckBox::toggled, [&](bool checked) {
+        if (checked) {
+            slider_gain->setEnabled(true);
+        } else {
+            slider_gain->setEnabled(false);
+        }
+    });
+
+    QObject::connect(checkBoxDiffGain, &QCheckBox::toggled, [&](bool checked) {
+        if (checked) {
+            slider_diff_gain->setEnabled(true);
+        } else {
+            slider_diff_gain->setEnabled(false);
+        }
     });
 }
 
