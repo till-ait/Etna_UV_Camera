@@ -2,6 +2,7 @@
 #include "CameraControler.h"
 #include "AppManager.h"
 #include "UserInterface.h"
+#include "SpectroControler.h"
 
 #define INDEX_CMD 0
 #define INDEX_DEVICE_NAME 1
@@ -75,17 +76,20 @@ void InputHandler::connect_cmd(const std::vector<std::string>& split_input){
         if(cameras->at(i)->Get_Data().name == split_input[1]) {
             result = cameras->at(i)->Try_Connection();
 
-            if(!result) {
-                appManager_->Get_UserInterface()->Ui_Print("Connection failed.");
-                return;
+            if(result) {
+                cameras->at(i)->start_Acquire();
             }
-
-            cameras->at(i)->start_Acquire();
         }
     }
 
+    if(split_input[1] == "spectro") {
+        SpectroControler* spectrometer = appManager_->Get_Spectrometer();
+        result = spectrometer->Connect();
+        // TODO : Start acquire
+    }
+
     if(!result) {
-        appManager_->Get_UserInterface()->Ui_Print("Device not found.");
+        appManager_->Get_UserInterface()->Ui_Print("Connection Failed.");
         return;
     }
 
@@ -118,7 +122,7 @@ void InputHandler::set_cmd(const std::vector<std::string>& split_input){
 void InputHandler::help_cmd() {
     std::string msg = "Commande list : \n";
 
-    msg += " - connect {cam330 or cam310} : try to connect to the designeted camera.\n";
+    msg += " - connect {cam330 or cam310 or spectro} : try to connect to the designeted camera or spectrometer.\n";
     msg += " - exit : exit programme.\n";
     msg += " - set {target} {args} {value} : set target's argument value. (args : fps/width/eight)\n";
     msg += " - help : print commands.\n";

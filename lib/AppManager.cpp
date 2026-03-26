@@ -4,6 +4,7 @@
 #include "CmdUi.h"
 #include "QtUi.h"
 #include "CameraControler.h"
+#include "SpectroControler.h"
 
 AppManager::AppManager() {
     std::cout << "App Manager created." << std::endl;
@@ -11,6 +12,7 @@ AppManager::AppManager() {
     Cameras = new std::vector<CameraControler*>();
     inputHandler_ = new InputHandler(this);
     userInterface_ = new QtUi(this);
+    spectrometer = new SpectroControler(this);
 }
 
 AppManager::AppManager(char** argv) {
@@ -40,6 +42,7 @@ AppManager::~AppManager() {
     }
     Cameras->clear();
     delete Cameras;
+    delete spectrometer;
     
     std::cout << "App Manager have been deleted." << std::endl;
 }
@@ -88,4 +91,8 @@ UserInterface* AppManager::Get_UserInterface() {
 
 InputHandler* AppManager::Get_InputHandler() {
     return inputHandler_;
+}
+
+SpectroControler* AppManager::Get_Spectrometer() {
+    return spectrometer;
 }

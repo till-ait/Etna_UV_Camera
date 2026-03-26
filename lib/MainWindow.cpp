@@ -188,6 +188,10 @@ MainWindow::MainWindow(AppManager* appManager, QWidget *parent)
         appManager_->Get_InputHandler()->Get_InputQueue()->push(new std::string("connect cam310"));
     });
 
+    QObject::connect(btn_connect_spectro, &QPushButton::clicked, [&]() {
+        appManager_->Get_InputHandler()->Get_InputQueue()->push(new std::string("connect spectro"));
+    });
+
     QObject::connect(btn_select_save_folder, &QPushButton::clicked, [&]() {
         QString folder = QFileDialog::getExistingDirectory(this, "Select a folder", "C:/", QFileDialog::ShowDirsOnly);
         if (!folder.isEmpty()) save_folder = folder + "/";
