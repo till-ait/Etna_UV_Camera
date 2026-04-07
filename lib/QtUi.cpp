@@ -100,6 +100,16 @@ void QtUi::Push_Frame(std::string* source_Name, uint8_t *data, uint32_t width, u
     );
 }
 
+void QtUi::Push_Spectrum(std::vector <double> spectrum, std::vector <double> wavelengths) {
+    QMetaObject::invokeMethod(
+        window,
+        "onNewSpectrum",
+        Qt::QueuedConnection,
+        Q_ARG(std::vector <double>, spectrum),
+        Q_ARG(std::vector <double>, wavelengths)
+    );
+}
+
 void QtUi::Ui_Print(std::string msg) {
     QMetaObject::invokeMethod(
         window,

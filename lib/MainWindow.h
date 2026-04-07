@@ -19,8 +19,8 @@
 #define DEFAULT_PERIODE 10000
 #define MIN_ACQUIRE_TIME 2000    // 63
 
-#define CAMLAYOUT_STRENGTH 4
-#define SPECTROMETERLAYOUT_STRENGTH 1
+#define CAMLAYOUT_STRENGTH 1
+#define SPECTROMETERLAYOUT_STRENGTH 4
 #define CAMBTLAYOUT_STRENGTH 1
 #define VIDEOLAYOUT_STRENGTH 5
 
@@ -42,6 +42,7 @@ public:
 
 public slots:
     void onNewFrame(QString sourceName, QImage image);
+    void onNewSpectrum(std::vector<double> spectrum, std::vector<double> wavelengths);
     void printQt(QString msg);
 
 private:

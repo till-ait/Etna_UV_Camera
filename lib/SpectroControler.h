@@ -1,6 +1,8 @@
 #ifndef SPECTROCONTROLER_H
 #define SPECTROCONTROLER_H
 
+#define NOMINMAX
+
 #include <iostream>
 #include <windows.h>
 #include <winusb.h>
@@ -18,8 +20,8 @@
 #include <cstring>
 
 #define EP_OUT 0x01
-#define EP_IN_DATA_1 0x02
-#define EP_IN_DATA_2 0x06
+#define EP_IN_DATA_1 0x82
+#define EP_IN_DATA_2 0x86
 #define EP_IN_CMD  0x81
 
 #define CMD_INIT             0x01
@@ -28,11 +30,19 @@
 #define CMD_QUERY_EEPROM     0x05
 #define CMD_SET_SCANS_AVG    0x49
 #define CMD_QUERY_INFO       0xfe
+#define CMD_TRIGGER_MODE     0x0A
 
 #define TIMEOUT_MS      5000
+#define SPECTRUM_PIXELS 2048
 
 #define CMD_BUF_LENGTH 64
 #define DATA_BUF_LENGTH 512
+
+#define DEFAULT_INTEGRATION_TIME 50000  // micro sec
+#define MAX_INTEGRATION_TIME 60000000
+#define MIN_INTEGRATION_TIME 10
+#define DEFAULT_AVERAGING 10
+#define DEFAULT_TRIGGER_MODE 0
 
 class AppManager;
 
@@ -43,10 +53,21 @@ public :
 
     bool Connect();
     bool Is_Connected();
+    bool Set_integration_time(uint32_t micros);
+    bool Set_scans_to_average(uint16_t scans);
+    bool Set_trigger_mode(uint8_t mode);
+    void Get_spectrum();
+    bool start_Acquire();
+    void stop_Acquire();
+    void LoadCalibration();
+    std::string ReadEEPROM(uint8_t slot);
+    double PixelToWavelength(int p);
+    void ProcessSpectrum(const std::vector<double>& raw, std::vector<double>& wavelengths, std::vector<double>& intensities);
 
 private :
     AppManager* appManager_;
     bool is_connected;
+    bool is_streaming;
     const std::string TARGET_VID = "vid_2457";
     const std::string TARGET_PID = "pid_1022";
 
@@ -57,6 +78,7 @@ private :
     HANDLE deviceHandle;
     SP_DEVICE_INTERFACE_DATA ifaceData;
     WINUSB_INTERFACE_HANDLE usbHandle;
+    bool usbHandleInitialized;
     UCHAR shortPacket;
     ULONG timeout;
     ULONG transferred;
@@ -65,6 +87,13 @@ private :
     uint8_t cmdBufOut[CMD_BUF_LENGTH] = {};
     uint8_t cmdBufIn[CMD_BUF_LENGTH] = {};
     uint8_t dataBuf[DATA_BUF_LENGTH] = {};
+
+    uint32_t integration_time;
+    uint16_t scans_average;
+
+    double wl_coef[4];
+
+    std::thread* thread_acquire;
 };
 
 #endif

@@ -263,6 +263,48 @@ MainWindow::MainWindow(AppManager* appManager, QWidget *parent)
     });
 }
 
+void MainWindow::onNewSpectrum(std::vector<double> spectrum, std::vector<double> wavelengths) {
+    if (spectrum.empty())
+        return;
+
+    QVector<QPointF> points;
+    points.reserve(spectrum.size());
+
+    for (int i = 0; i < spectrum.size(); ++i)
+    {
+        points.append(QPointF(wavelengths[i], spectrum[i]));
+    }
+
+    series_spectro->replace(points);
+
+    chart_spectro->axes(Qt::Horizontal).first()->setRange(wavelengths[0], wavelengths[spectrum.size()-1]);
+
+    auto axisY = chart_spectro->axes(Qt::Vertical).first();
+
+    double minY = *std::min_element(spectrum.begin(), spectrum.end());
+    // double maxY = *std::max_element(spectrum.begin(), spectrum.end());
+
+    double maxY = 0.0;
+    // double maxY = 150.0;
+    for(double value : spectrum) {
+        if(value > maxY) maxY = value;
+    }
+    
+    axisY->setRange(minY, maxY);
+    // axisY->setRange(-1, 1);
+    
+    // std::cout << "Spectrum recived" << std::endl;
+    // // series_spectro = new QLineSeries();
+    // // series_spectro->append(0, 6);   // TODO : Replace by the true values
+    
+    // int i=0;
+    // for(double value : spectrum){
+    //     series_spectro->append(i, value);
+    //     i++;
+    // }
+    // // chart_spectro->addSeries(series_spectro);
+    // // chartView = new QChartView(chart_spectro);
+}
 
 void MainWindow::onNewFrame(QString sourceName, QImage image) {
     std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
