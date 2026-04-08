@@ -20,6 +20,7 @@ target_link_libraries(Etna_UV_Camera PRIVATE
     MainWindow
     CamView
     SpectroControler
+    CSV_file_manager
     PvDevice64.lib
     PvStream64.lib
     PvBase64.lib

@@ -40,6 +40,9 @@ add_library(CamView
 add_library(SpectroControler
             SpectroControler.cpp)
 
+add_library(CSV_file_manager
+            CSV_file_manager.cpp)
+
 target_include_directories(hal_UV_Cam PUBLIC 
                             ${CMAKE_CURRENT_SOURCE_DIR}
                             ${EBUS_INCLUDE_DIR})
@@ -102,3 +105,6 @@ target_include_directories(SpectroControler PUBLIC
                             ${CMAKE_CURRENT_SOURCE_DIR})
 
 target_link_libraries(SpectroControler PUBLIC winusb setupapi)    
+                            
+target_include_directories(CSV_file_manager PUBLIC 
+                            ${CMAKE_CURRENT_SOURCE_DIR})

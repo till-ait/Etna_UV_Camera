@@ -258,8 +258,8 @@ void SpectroControler::Get_spectrum() {
         std::vector<double> wavelengths, intensities;
         for (int i = 0; i < received/2; ++i) {
             uint16_t val = (uint16_t)(raw[2*i] | (raw[2*i+1] << 8));
-            // spectrum[i] = static_cast<double> (val);
-            spectrum[i] = 20*(std::log10(static_cast<double> (val)));
+            spectrum[i] = static_cast<double> (val);
+            // spectrum[i] = 20*(std::log10(static_cast<double> (val)));
         }
 
         ProcessSpectrum(spectrum, wavelengths, intensities);
@@ -316,8 +316,8 @@ void SpectroControler::LoadCalibration() {
     wl_coef[2] = std::stod(s2);
     wl_coef[3] = std::stod(s3);
 
-    std::cout << "λ0=" << wl_coef[0] << " C1=" << wl_coef[1]
-              << " C2=" << wl_coef[2] << " C3=" << wl_coef[3] << std::endl;
+    // std::cout << "λ0=" << wl_coef[0] << " C1=" << wl_coef[1]
+    //           << " C2=" << wl_coef[2] << " C3=" << wl_coef[3] << std::endl;
 }
 
 double SpectroControler::PixelToWavelength(int p) {

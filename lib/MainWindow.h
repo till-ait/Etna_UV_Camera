@@ -30,6 +30,7 @@
 
 class AppManager;
 class CamView;
+class CSV_file_manager;
 
 
 class MainWindow : public QWidget {
@@ -47,10 +48,13 @@ public slots:
 
 private:
     bool save_images;
+    bool save_spectrum;
     long time_between_save_ms;
     std::chrono::steady_clock::time_point time_last_save_cam330;
     std::chrono::steady_clock::time_point time_last_save_cam310;
+    std::chrono::steady_clock::time_point time_last_save_spectrum;
     QString save_folder;
+    CSV_file_manager *csv_file;
 
     AppManager* appManager_;
 
@@ -88,7 +92,8 @@ private:
 
     QPushButton *btn_connect_spectro;
     QPushButton *btn_acquire_spectro;
-    QSpinBox *spin_spectro_gain;
+    QCheckBox *checkBox_spectro_gain;
+    QSlider *slider_spectro_gain;
     QLineSeries *series_spectro;
     QChart *chart_spectro;
     QChartView *chartView;

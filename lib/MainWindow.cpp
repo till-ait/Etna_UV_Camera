@@ -8,21 +8,27 @@
 #include <thread>
 #include "CamView.h"
 #include "CameraControler.h"
+#include "SpectroControler.h"
+#include "CSV_file_manager.h"
 
 #include <iostream>
 
 MainWindow::MainWindow(AppManager* appManager, QWidget *parent)
 : QWidget(parent), appManager_(appManager) {
     save_images = false;
+    save_spectrum = false;
     time_between_save_ms = DEFAULT_PERIODE;
     time_last_save_cam330 = std::chrono::steady_clock::now();
     time_last_save_cam310 = std::chrono::steady_clock::now();
+    time_last_save_spectrum = std::chrono::steady_clock::now();
     save_folder = "";
     image_cam330_counter = 0;
     image_cam310_counter = 0;
 
     master_gain = 1.0;
     diff_gain = 0.0;
+
+    csv_file = NULL;
 
     //// LAYOUT ////
 
@@ -131,17 +137,21 @@ MainWindow::MainWindow(AppManager* appManager, QWidget *parent)
     img_spectro->setAlignment(Qt::AlignCenter);
     img_spectro->setMinimumSize(600, 100);
     btn_connect_spectro = new QPushButton("Connect Spectro");
-    btn_acquire_spectro = new QPushButton("Start Acquire");
-    spin_spectro_gain = new QSpinBox();
-    spin_spectro_gain->setMinimum(MIN_ACQUIRE_TIME);
-    spin_spectro_gain->setMaximum(1000);
-    spin_spectro_gain->setSuffix(" dB");
+    btn_acquire_spectro = new QPushButton("Start Rec");
+    checkBox_spectro_gain = new QCheckBox("Gain enable :");
+    slider_spectro_gain = new QSlider(Qt::Horizontal);
+    slider_spectro_gain->setMinimum(500);
+    slider_spectro_gain->setMaximum(60000);
+    slider_spectro_gain->setValue(500);
+    slider_spectro_gain->setSingleStep(1);
+    slider_spectro_gain->setPageStep(1);
+    slider_spectro_gain->setEnabled(false);
     series_spectro = new QLineSeries();
     series_spectro->append(0, 6);   // TODO : Replace by the true values
     series_spectro->append(2, 4);
     series_spectro->append(3, 8);
     series_spectro->append(7, 4);
-    series_spectro->setPen(QPen(Qt::black, 2));
+    series_spectro->setPen(QPen(Qt::black, 1));
     chart_spectro = new QChart();
     chart_spectro->addSeries(series_spectro);
     chart_spectro->createDefaultAxes();
@@ -153,7 +163,8 @@ MainWindow::MainWindow(AppManager* appManager, QWidget *parent)
     chartView->setRenderHint(QPainter::Antialiasing);
     SpectrometerBtnLayout->addWidget(btn_connect_spectro);
     SpectrometerBtnLayout->addWidget(btn_acquire_spectro);
-    SpectrometerBtnLayout->addWidget(spin_spectro_gain);
+    SpectrometerBtnLayout->addWidget(checkBox_spectro_gain);
+    SpectrometerBtnLayout->addWidget(slider_spectro_gain);
     SpectrometerLayout->addLayout(SpectrometerBtnLayout, 1);
     SpectrometerLayout->addWidget(chartView, 5);
     // SpectrometerLayout->addWidget(img_spectro);
@@ -172,11 +183,21 @@ MainWindow::MainWindow(AppManager* appManager, QWidget *parent)
     // Quit cross
     QObject::connect(qApp, &QApplication::lastWindowClosed, [&]() {
         appManager_->Get_InputHandler()->Get_InputQueue()->push(new std::string("exit"));
+        if(csv_file != NULL){
+            if(!csv_file->is_saved()){
+                csv_file->save();
+            }
+        }
         qApp->quit();
     });
 
     QObject::connect(btn_exit, &QPushButton::clicked, [&]() {
         appManager_->Get_InputHandler()->Get_InputQueue()->push(new std::string("exit"));
+        if(csv_file != NULL){
+            if(!csv_file->is_saved()){
+                csv_file->save();
+            }
+        }
         qApp->quit();
     });
 
@@ -261,6 +282,44 @@ MainWindow::MainWindow(AppManager* appManager, QWidget *parent)
             slider_diff_gain->setEnabled(false);
         }
     });
+
+    QObject::connect(checkBox_spectro_gain, &QCheckBox::toggled, [&](bool checked) {
+        if (checked) {
+            slider_spectro_gain->setEnabled(true);
+        } else {
+            slider_spectro_gain->setEnabled(false);
+        }
+    });
+
+    QObject::connect(slider_spectro_gain, &QSlider::valueChanged, [&](int value) {
+        if(appManager_->Get_Spectrometer()->Is_Connected()){
+            appManager_->Get_Spectrometer()->Set_integration_time(value);
+        }
+    });
+
+    QObject::connect(btn_acquire_spectro, &QPushButton::clicked, [&]() {
+        if(save_spectrum) {
+            save_spectrum = false;
+            btn_acquire_spectro->setText("Start Rec");
+            csv_file->save();
+            return;
+        }
+
+        if(!save_images) {
+            QString folder = QFileDialog::getExistingDirectory(this, "Select a folder", "C:/", QFileDialog::ShowDirsOnly);
+            if (!folder.isEmpty()) {
+                save_folder = folder + "/";
+            }
+            else {
+                return;
+            }
+        }
+
+        save_spectrum = true;
+        btn_acquire_spectro->setText("Stop Rec");
+        QString csv_name = "Spetrum_" + QDateTime::currentDateTime().toString("yyyyMMdd_hhmmss_zzz") + ".csv";
+        csv_file = new CSV_file_manager(csv_name.toStdString(), save_folder.toStdString());
+    });
 }
 
 void MainWindow::onNewSpectrum(std::vector<double> spectrum, std::vector<double> wavelengths) {
@@ -284,26 +343,35 @@ void MainWindow::onNewSpectrum(std::vector<double> spectrum, std::vector<double>
     double minY = *std::min_element(spectrum.begin(), spectrum.end());
     // double maxY = *std::max_element(spectrum.begin(), spectrum.end());
 
-    double maxY = 0.0;
+    double maxY = 150.0;
     // double maxY = 150.0;
     for(double value : spectrum) {
         if(value > maxY) maxY = value;
     }
     
     axisY->setRange(minY, maxY);
-    // axisY->setRange(-1, 1);
-    
-    // std::cout << "Spectrum recived" << std::endl;
-    // // series_spectro = new QLineSeries();
-    // // series_spectro->append(0, 6);   // TODO : Replace by the true values
-    
-    // int i=0;
-    // for(double value : spectrum){
-    //     series_spectro->append(i, value);
-    //     i++;
-    // }
-    // // chart_spectro->addSeries(series_spectro);
-    // // chartView = new QChartView(chart_spectro);
+
+    std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
+    double elapsed = std::chrono::duration<double, std::milli>(now - time_last_save_spectrum).count();
+
+    if (save_spectrum && (elapsed >= time_between_save_ms)) {
+        if(csv_file->Is_empty()) {
+            std::vector<std::string> data;
+            data.push_back("nm\\time");
+            for(double value : wavelengths) {
+                data.push_back(std::to_string(value));
+            }
+            csv_file->Set_lines_header(data);
+        }
+        
+        std::vector<std::string> data;
+        data.push_back(QDateTime::currentDateTime().toString("yyyyMMdd_hhmmss_zzz").toStdString());
+        for(double value : spectrum) {
+            data.push_back(std::to_string(value));
+        }
+        csv_file->push_colum_without_saving(data);
+        time_last_save_spectrum = std::chrono::steady_clock::now();
+    }
 }
 
 void MainWindow::onNewFrame(QString sourceName, QImage image) {
