@@ -43,6 +43,8 @@
 #define MIN_INTEGRATION_TIME 1
 #define DEFAULT_AVERAGING 5
 #define DEFAULT_TRIGGER_MODE 0
+#define SPECTRUM_LENGTH 3840
+#define DEFAULT_AVERAGING_ALPHA 0.1
 
 class AppManager;
 
@@ -92,6 +94,8 @@ private :
     uint16_t scans_average;
 
     double wl_coef[4];
+    std::vector<double> average_spectrum = std::vector<double>(SPECTRUM_LENGTH, 0.0);
+    float alpha_coef = DEFAULT_AVERAGING_ALPHA;
 
     std::thread* thread_acquire;
 };

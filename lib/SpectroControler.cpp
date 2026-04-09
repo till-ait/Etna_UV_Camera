@@ -258,11 +258,12 @@ void SpectroControler::Get_spectrum() {
         std::vector<double> wavelengths, intensities;
         for (int i = 0; i < received/2; ++i) {
             uint16_t val = (uint16_t)(raw[2*i] | (raw[2*i+1] << 8));
-            spectrum[i] = static_cast<double> (val);
+            // spectrum[i] = static_cast<double> (val);
             // spectrum[i] = 20*(std::log10(static_cast<double> (val)));
+            average_spectrum[i] = (1-alpha_coef)*average_spectrum[i] + (alpha_coef)*val;
         }
 
-        ProcessSpectrum(spectrum, wavelengths, intensities);
+        ProcessSpectrum(average_spectrum, wavelengths, intensities);
         // std::vector<double> spectrum(SPECTRUM_PIXELS);
         // for (int i = 0; i < SPECTRUM_PIXELS; ++i) {
         //     uint16_t val = (uint16_t)(raw[2*i] | (raw[2*i+1] << 8));
