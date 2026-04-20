@@ -174,13 +174,13 @@ void CameraControler::Acquire_Images() {
         PvResult lResult = stream->RetrieveBuffer( &lBuffer, &lOperationResult, 1000 );
 
         if (!lResult.IsOK()){
-            appManager_->Get_UserInterface()->Ui_Print("Err : Fail to recive buffer.");
+            // appManager_->Get_UserInterface()->Ui_Print("Err : Fail to recive buffer.");
             continue;
         }
 
         if (!lOperationResult.IsOK()){
             stream->QueueBuffer( lBuffer );
-            appManager_->Get_UserInterface()->Ui_Print("Err : Fail operation while recive buffer.");
+            // appManager_->Get_UserInterface()->Ui_Print("Err : Fail operation while recive buffer.");
             continue;
         }
 

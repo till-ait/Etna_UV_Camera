@@ -147,10 +147,6 @@ MainWindow::MainWindow(AppManager* appManager, QWidget *parent)
     slider_spectro_gain->setPageStep(1);
     slider_spectro_gain->setEnabled(false);
     series_spectro = new QLineSeries();
-    series_spectro->append(0, 6);   // TODO : Replace by the true values
-    series_spectro->append(2, 4);
-    series_spectro->append(3, 8);
-    series_spectro->append(7, 4);
     series_spectro->setPen(QPen(Qt::black, 1));
     chart_spectro = new QChart();
     chart_spectro->addSeries(series_spectro);
