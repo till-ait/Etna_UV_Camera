@@ -355,23 +355,65 @@ void MainWindow::onNewSpectrum(std::vector<double> spectrum, std::vector<double>
     double elapsed = std::chrono::duration<double, std::milli>(now - time_last_save_spectrum).count();
 
     if (save_spectrum && (elapsed >= time_between_save_ms)) {
-        if(csv_file->Is_empty()) {
-            std::vector<std::string> data;
-            data.push_back("nm\\time");
-            for(double value : wavelengths) {
-                data.push_back(std::to_string(value));
-            }
-            csv_file->Set_lines_header(data);
-        }
+        saving_spectrum(spectrum, wavelengths);
+        // if(csv_file->Is_empty()) {
+        //     std::vector<std::string> data;
+        //     data.push_back("+++++++++++++++++++++++++");
+        //     data.push_back("DATE : " + QDateTime::currentDateTime().toString("yyyyMMdd_hhmmss").toStdString());
+        //     data.push_back("Spectrometer serial number : " + appManager_->Get_Spectrometer()->Get_serial_number());
+        //     data.push_back("Integration Time : " + appManager_->Get_Spectrometer()->Get_integration_time());
+        //     data.push_back("Spectral averaged : " + appManager_->Get_Spectrometer()->Get_scans_to_average());
+        //     data.push_back("Number of pixel in file : 2048");
+        //     data.push_back("begin : " + std::to_string(wavelengths[0]) + " nm");
+        //     data.push_back("end : " + std::to_string(wavelengths[wavelengths.size()-1]) + " nm");
+        //     data.push_back("Temperature : Unknow");
+        //     data.push_back("+++++++++++++++++++++++++");
+        //     int header_lentgth = data.size();
+        //     data.push_back("nm\\time");
+        //     for(double value : wavelengths) {
+        //         data.push_back(std::to_string(value));
+        //     }
+        //     csv_file->Set_lines_header(data, header_lentgth);
+        // }
         
+        // std::vector<std::string> data;
+        // data.push_back(QDateTime::currentDateTime().toString("hh/mm/ss").toStdString());
+        // for(double value : spectrum) {
+        //     data.push_back(std::to_string(value));
+        // }
+        // csv_file->push_colum_without_saving(data);
+        // time_last_save_spectrum = std::chrono::steady_clock::now();
+    }
+}
+
+void MainWindow::saving_spectrum(std::vector<double> spectrum, std::vector<double> wavelengths) {
+    if(csv_file->Is_empty()) {
         std::vector<std::string> data;
-        data.push_back(QDateTime::currentDateTime().toString("yyyyMMdd_hhmmss_zzz").toStdString());
-        for(double value : spectrum) {
+        data.push_back("+++++++++++++++++++++++++");
+        data.push_back("DATE : " + QDateTime::currentDateTime().toString("yyyy/MM/dd_hh/mm/ss").toStdString());
+        data.push_back("Spectrometer serial number : " + appManager_->Get_Spectrometer()->Get_serial_number());
+        data.push_back("Integration Time : " + appManager_->Get_Spectrometer()->Get_integration_time());
+        data.push_back("Spectral averaged : " + appManager_->Get_Spectrometer()->Get_scans_to_average());
+        data.push_back("Number of pixel in file : 2048");
+        data.push_back("begin : " + std::to_string(wavelengths[0]) + " nm");
+        data.push_back("end : " + std::to_string(wavelengths[wavelengths.size()-1]) + " nm");
+        data.push_back("Temperature : Unknow");
+        data.push_back("+++++++++++++++++++++++++");
+        int header_lentgth = data.size();
+        data.push_back("nm\\time");
+        for(double value : wavelengths) {
             data.push_back(std::to_string(value));
         }
-        csv_file->push_colum_without_saving(data);
-        time_last_save_spectrum = std::chrono::steady_clock::now();
+        csv_file->Set_lines_header(data, header_lentgth);
     }
+    
+    std::vector<std::string> data;
+    data.push_back(QDateTime::currentDateTime().toString("hh/mm/ss").toStdString());
+    for(double value : spectrum) {
+        data.push_back(std::to_string(value));
+    }
+    csv_file->push_colum_without_saving(data);
+    time_last_save_spectrum = std::chrono::steady_clock::now();
 }
 
 void MainWindow::onNewFrame(QString sourceName, QImage image) {

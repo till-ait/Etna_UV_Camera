@@ -19,6 +19,7 @@ SpectroControler::SpectroControler(AppManager *_appManager_) {
     scans_average = DEFAULT_AVERAGING;
     thread_acquire = NULL;
     is_streaming = false;
+    serial_number = "Unknown";
     HANDLE deviceHandle = INVALID_HANDLE_VALUE;
     usbHandleInitialized = false;
 }
@@ -104,7 +105,8 @@ bool SpectroControler::Connect() {
 
     memset(cmdBufOut, 0, CMD_BUF_LENGTH);
     cmdBufOut[0] = CMD_QUERY_INFO;
-    trasfert_result = WinUsb_WritePipe(usbHandle, EP_OUT, cmdBufOut, 1, &transferred, NULL);
+    cmdBufOut[1] = 0x00;
+    trasfert_result = WinUsb_WritePipe(usbHandle, EP_OUT, cmdBufOut, 2, &transferred, NULL);
     if(!trasfert_result) {
         appManager_->Get_UserInterface()->Ui_Print("Err : Spectrometer Querry Info send failed.");
         return false;
@@ -116,6 +118,16 @@ bool SpectroControler::Connect() {
         appManager_->Get_UserInterface()->Ui_Print("Err : Spectrometer Querry Info recived failed.");
         return false;
     }
+
+    // serial_number = std::string(reinterpret_cast<char*>(cmdBufIn + 2), 15);
+    // std::cout << "Serial : " << serial_number << std::endl;
+    std::ostringstream oss;
+    for (int i = 2; i < 2 + 15; i++) {
+        oss << std::hex << std::uppercase
+            << std::setw(2) << std::setfill('0')
+            << static_cast<int>(cmdBufIn[i]);
+    }
+    serial_number = oss.str();
 
     is_connected = true;
 
@@ -347,4 +359,16 @@ void SpectroControler::ProcessSpectrum(
         wavelengths[i] = PixelToWavelength(pixel);
         intensities[i] = std::max(0.0, raw[pixel] - dark_avg);
     }
+}
+
+int SpectroControler::Get_integration_time() {
+    return integration_time;
+}
+
+int SpectroControler::Get_scans_to_average() {
+    return scans_average;
+}
+
+std::string SpectroControler::Get_serial_number() {
+    return serial_number;
 }

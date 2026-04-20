@@ -18,6 +18,7 @@
 #include <chrono>
 #include <cstdint>
 #include <cstring>
+#include <sstream>
 
 #define EP_OUT 0x01
 #define EP_IN_DATA_1 0x82
@@ -56,7 +57,10 @@ public :
     bool Connect();
     bool Is_Connected();
     bool Set_integration_time(uint32_t micros);
+    int Get_integration_time();
     bool Set_scans_to_average(uint16_t scans);
+    int Get_scans_to_average();
+    std::string Get_serial_number();
     bool Set_trigger_mode(uint8_t mode);
     void Get_spectrum();
     bool start_Acquire();
@@ -98,6 +102,7 @@ private :
     float alpha_coef = DEFAULT_AVERAGING_ALPHA;
 
     std::thread* thread_acquire;
+    std::string serial_number;
 };
 
 #endif

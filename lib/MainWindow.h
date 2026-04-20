@@ -19,7 +19,7 @@
 #define DEFAULT_PERIODE 10000
 #define MIN_ACQUIRE_TIME 2000    // 63
 
-#define CAMLAYOUT_STRENGTH 1
+#define CAMLAYOUT_STRENGTH 6
 #define SPECTROMETERLAYOUT_STRENGTH 4
 #define CAMBTLAYOUT_STRENGTH 1
 #define VIDEOLAYOUT_STRENGTH 5
@@ -113,6 +113,7 @@ private:
     void Save_images_activation();
     void align_crosses();
     void update_gain();
+    void saving_spectrum(std::vector<double> spectrum, std::vector<double> wavelengths);
 
     int image_cam330_counter;
     int image_cam310_counter;

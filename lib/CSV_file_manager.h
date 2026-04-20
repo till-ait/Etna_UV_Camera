@@ -13,7 +13,7 @@ public:
     bool Is_empty();
     void push_colum_without_saving(std::vector<double> datas);
     void push_colum_without_saving(std::vector<std::string> datas);
-    void Set_lines_header(std::vector<std::string> datas);
+    void Set_lines_header(std::vector<std::string> datas, int _header_lentgth);
     bool is_saved();
     void save();
 
@@ -21,6 +21,7 @@ private:
     std::string name;
     std::string path;
     bool file_saved;
+    int header_lentgth;
     
     std::vector<std::string> lines;
 

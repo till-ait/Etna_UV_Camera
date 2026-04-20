@@ -4,6 +4,7 @@ CSV_file_manager::CSV_file_manager(std::string _name, std::string _path) {
     name = _name;
     path = _path;
     file_saved = true;
+    header_lentgth = 0;
 
     Open_file();
 }
@@ -32,7 +33,7 @@ void CSV_file_manager::Open_file() {
 }
 
 void CSV_file_manager::push_colum_without_saving(std::vector<double> datas) {
-    int i = 0;
+    int i = header_lentgth;
     file_saved = false;
     for(double data : datas) {
         if(i >= lines.size()) {
@@ -46,20 +47,21 @@ void CSV_file_manager::push_colum_without_saving(std::vector<double> datas) {
 }
 
 void CSV_file_manager::push_colum_without_saving(std::vector<std::string> datas) {
-    int i = 0;
+    int i = header_lentgth;
     file_saved = false;
     for(std::string data : datas) {
         if(i >= lines.size()) {
             break;
         }
 
-        lines[i] = lines[i] + "," + data;
+        lines[i] = lines[i] + ";" + data;
         
         i++;
     }
 }
 
-void CSV_file_manager::Set_lines_header(std::vector<std::string> datas) {
+void CSV_file_manager::Set_lines_header(std::vector<std::string> datas, int _header_lentgth) {
+    header_lentgth = _header_lentgth;
     file_saved = false;
     for(std::string data : datas) {
         lines.push_back(data);
