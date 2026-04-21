@@ -138,7 +138,7 @@ MainWindow::MainWindow(AppManager* appManager, QWidget *parent)
     img_spectro->setMinimumSize(600, 100);
     btn_connect_spectro = new QPushButton("Connect Spectro");
     btn_acquire_spectro = new QPushButton("Start Rec");
-    checkBox_spectro_gain = new QCheckBox("Gain enable :");
+    checkBox_spectro_gain = new QCheckBox("Gain :");
     slider_spectro_gain = new QSlider(Qt::Horizontal);
     slider_spectro_gain->setMinimum(500);
     slider_spectro_gain->setMaximum(60000);
@@ -146,6 +146,14 @@ MainWindow::MainWindow(AppManager* appManager, QWidget *parent)
     slider_spectro_gain->setSingleStep(1);
     slider_spectro_gain->setPageStep(1);
     slider_spectro_gain->setEnabled(false);
+    checkBox_spectro_averaging = new QCheckBox("Averaging :");
+    slider_spectro_averaging = new QSlider(Qt::Horizontal);
+    slider_spectro_averaging->setMinimum(1);
+    slider_spectro_averaging->setMaximum(100);
+    slider_spectro_averaging->setValue(1);
+    slider_spectro_averaging->setSingleStep(1);
+    slider_spectro_averaging->setPageStep(1);
+    slider_spectro_averaging->setEnabled(false);
     series_spectro = new QLineSeries();
     series_spectro->setPen(QPen(Qt::black, 1));
     chart_spectro = new QChart();
@@ -161,6 +169,8 @@ MainWindow::MainWindow(AppManager* appManager, QWidget *parent)
     SpectrometerBtnLayout->addWidget(btn_acquire_spectro);
     SpectrometerBtnLayout->addWidget(checkBox_spectro_gain);
     SpectrometerBtnLayout->addWidget(slider_spectro_gain);
+    SpectrometerBtnLayout->addWidget(checkBox_spectro_averaging);
+    SpectrometerBtnLayout->addWidget(slider_spectro_averaging);
     SpectrometerLayout->addLayout(SpectrometerBtnLayout, 1);
     SpectrometerLayout->addWidget(chartView, 5);
     // SpectrometerLayout->addWidget(img_spectro);
@@ -290,6 +300,20 @@ MainWindow::MainWindow(AppManager* appManager, QWidget *parent)
     QObject::connect(slider_spectro_gain, &QSlider::valueChanged, [&](int value) {
         if(appManager_->Get_Spectrometer()->Is_Connected()){
             appManager_->Get_Spectrometer()->Set_integration_time(value);
+        }
+    });
+
+    QObject::connect(checkBox_spectro_averaging, &QCheckBox::toggled, [&](bool checked) {
+        if (checked) {
+            slider_spectro_averaging->setEnabled(true);
+        } else {
+            slider_spectro_averaging->setEnabled(false);
+        }
+    });
+    
+    QObject::connect(slider_spectro_averaging, &QSlider::valueChanged, [&](int value) {
+        if(appManager_->Get_Spectrometer()->Is_Connected()){
+            appManager_->Get_Spectrometer()->Set_scans_to_average(value);
         }
     });
 

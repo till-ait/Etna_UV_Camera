@@ -94,6 +94,8 @@ private:
     QPushButton *btn_acquire_spectro;
     QCheckBox *checkBox_spectro_gain;
     QSlider *slider_spectro_gain;
+    QCheckBox *checkBox_spectro_averaging;
+    QSlider *slider_spectro_averaging;
     QLineSeries *series_spectro;
     QChart *chart_spectro;
     QChartView *chartView;
