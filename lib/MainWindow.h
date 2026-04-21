@@ -48,6 +48,7 @@ public slots:
 
 private:
     bool save_images;
+    bool pause_save_image;
     bool save_spectrum;
     long time_between_save_ms;
     std::chrono::steady_clock::time_point time_last_save_cam330;
@@ -73,6 +74,7 @@ private:
     QPushButton *btn_connect_cam310;
     QPushButton *btn_select_save_folder;
     QPushButton *btn_save_images;
+    QPushButton *btn_pause_save_images;
     QLabel *label_periode;
     QSpinBox *spin_periode;
     QPushButton *btn_recenter_cross;

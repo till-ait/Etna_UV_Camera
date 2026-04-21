@@ -16,6 +16,7 @@
 MainWindow::MainWindow(AppManager* appManager, QWidget *parent)
 : QWidget(parent), appManager_(appManager) {
     save_images = false;
+    pause_save_image = false;
     save_spectrum = false;
     time_between_save_ms = DEFAULT_PERIODE;
     time_last_save_cam330 = std::chrono::steady_clock::now();
@@ -55,6 +56,7 @@ MainWindow::MainWindow(AppManager* appManager, QWidget *parent)
     btn_connect_cam310 = new QPushButton("Connect cam310");
     btn_select_save_folder = new QPushButton("Select save folder");
     btn_save_images = new QPushButton("Start Rec");
+    btn_pause_save_images = new QPushButton("Pause Rec");
     label_periode = new QLabel("Acquire Timing :");
     spin_periode = new QSpinBox();
     spin_periode->setMinimum(MIN_ACQUIRE_TIME/1000);
@@ -101,6 +103,7 @@ MainWindow::MainWindow(AppManager* appManager, QWidget *parent)
     CamBtLayout->addWidget(label_periode);
     CamBtLayout->addWidget(spin_periode);
     CamBtLayout->addWidget(btn_save_images);
+    CamBtLayout->addWidget(btn_pause_save_images);
     // CamBtLayout->addWidget(label_exposure_time);
     CamBtLayout->addWidget(checkBoxExposure);
     CamBtLayout->addWidget(slider_exposure_time);
@@ -242,6 +245,23 @@ MainWindow::MainWindow(AppManager* appManager, QWidget *parent)
 
     QObject::connect(btn_save_images, &QPushButton::clicked, [&]() {
         Save_images_activation();
+    });
+
+    QObject::connect(btn_pause_save_images, &QPushButton::clicked, [&]() {
+        if(save_images && !pause_save_image) {
+            save_images = false;
+            pause_save_image = true;
+            btn_pause_save_images->setText("Resume Rec");
+            img_cam330->Set_is_reccorded(false);
+            img_cam310->Set_is_reccorded(false);
+        }
+        else if(!save_images && pause_save_image) {
+            save_images = true;
+            pause_save_image = false;
+            btn_pause_save_images->setText("Pause Rec");
+            img_cam330->Set_is_reccorded(true);
+            img_cam310->Set_is_reccorded(true);
+        }
     });
 
     QObject::connect(spin_periode, &QSpinBox::valueChanged, [&](long value) {
@@ -490,9 +510,11 @@ void MainWindow::Set_Time_between_save(long value) {
 
 
 void MainWindow::Save_images_activation(){
-    if(save_images){
+    if(save_images || pause_save_image){
         save_images = false;
+        pause_save_image = false;
         btn_save_images->setText("Start Rec");
+        btn_pause_save_images->setText("Pause Rec");
         img_cam330->Set_is_reccorded(false);
         img_cam310->Set_is_reccorded(false);
     }
@@ -506,6 +528,7 @@ void MainWindow::Save_images_activation(){
         }
 
         save_images = true;
+        pause_save_image = false;
         btn_save_images->setText("Stop Rec");
         
         image_cam330_counter = 0;
