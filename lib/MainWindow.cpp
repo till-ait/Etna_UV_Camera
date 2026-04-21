@@ -357,8 +357,8 @@ MainWindow::MainWindow(AppManager* appManager, QWidget *parent)
 
         save_spectrum = true;
         btn_acquire_spectro->setText("Stop Rec");
-        QString csv_name = "Spetrum_" + QDateTime::currentDateTime().toString("yyyyMMdd_hhmmss_zzz") + ".csv";
-        csv_file = new CSV_file_manager(csv_name.toStdString(), save_folder.toStdString());
+        // QString csv_name = "Spetrum_" + QDateTime::currentDateTime().toString("yyyyMMdd_hhmmss_zzz") + ".csv";
+        // csv_file = new CSV_file_manager(csv_name.toStdString(), save_folder.toStdString());
     });
 }
 
@@ -427,10 +427,13 @@ void MainWindow::onNewSpectrum(std::vector<double> spectrum, std::vector<double>
 }
 
 void MainWindow::saving_spectrum(std::vector<double> spectrum, std::vector<double> wavelengths) {
+    QString csv_name = "Spetrum_" + QDateTime::currentDateTime().toString("yyyyMMdd_hhmmss_zzz") + ".csv";
+    csv_file = new CSV_file_manager(csv_name.toStdString(), save_folder.toStdString());
+
     if(csv_file->Is_empty()) {
         std::vector<std::string> data;
         data.push_back("+++++++++++++++++++++++++");
-        data.push_back("DATE : " + QDateTime::currentDateTime().toString("yyyy/MM/dd_hh/mm/ss").toStdString());
+        data.push_back("DATE : " + QDateTime::currentDateTime().toString("yyyy/MM/dd_hh-mm-ss").toStdString());
         data.push_back("Spectrometer serial number : " + appManager_->Get_Spectrometer()->Get_serial_number());
         data.push_back("Integration Time : " + appManager_->Get_Spectrometer()->Get_integration_time());
         data.push_back("Spectral averaged : " + appManager_->Get_Spectrometer()->Get_scans_to_average());
@@ -454,6 +457,7 @@ void MainWindow::saving_spectrum(std::vector<double> spectrum, std::vector<doubl
     }
     csv_file->push_colum_without_saving(data);
     time_last_save_spectrum = std::chrono::steady_clock::now();
+    csv_file->save();
 }
 
 void MainWindow::onNewFrame(QString sourceName, QImage image) {
