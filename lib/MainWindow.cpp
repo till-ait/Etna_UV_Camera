@@ -141,7 +141,7 @@ MainWindow::MainWindow(AppManager* appManager, QWidget *parent)
     img_spectro->setMinimumSize(600, 100);
     btn_connect_spectro = new QPushButton("Connect Spectro");
     btn_acquire_spectro = new QPushButton("Start Rec");
-    checkBox_spectro_gain = new QCheckBox("Gain :");
+    checkBox_spectro_gain = new QCheckBox("Gain : " + QString::fromStdString(std::to_string(appManager_->Get_Spectrometer()->Get_integration_time())));
     slider_spectro_gain = new QSlider(Qt::Horizontal);
     slider_spectro_gain->setMinimum(500);
     slider_spectro_gain->setMaximum(60000);
@@ -149,7 +149,7 @@ MainWindow::MainWindow(AppManager* appManager, QWidget *parent)
     slider_spectro_gain->setSingleStep(1);
     slider_spectro_gain->setPageStep(1);
     slider_spectro_gain->setEnabled(false);
-    checkBox_spectro_averaging = new QCheckBox("Averaging :");
+    checkBox_spectro_averaging = new QCheckBox("Averaging : " + QString::fromStdString(std::to_string(appManager_->Get_Spectrometer()->Get_scans_to_average())));
     slider_spectro_averaging = new QSlider(Qt::Horizontal);
     slider_spectro_averaging->setMinimum(1);
     slider_spectro_averaging->setMaximum(100);
@@ -321,6 +321,7 @@ MainWindow::MainWindow(AppManager* appManager, QWidget *parent)
         if(appManager_->Get_Spectrometer()->Is_Connected()){
             appManager_->Get_Spectrometer()->Set_integration_time(value);
         }
+        checkBox_spectro_gain->setText("Gain : " + QString::fromStdString(std::to_string(appManager_->Get_Spectrometer()->Get_integration_time())));
     });
 
     QObject::connect(checkBox_spectro_averaging, &QCheckBox::toggled, [&](bool checked) {
@@ -335,6 +336,7 @@ MainWindow::MainWindow(AppManager* appManager, QWidget *parent)
         if(appManager_->Get_Spectrometer()->Is_Connected()){
             appManager_->Get_Spectrometer()->Set_scans_to_average(value);
         }
+        checkBox_spectro_averaging->setText("Gain : " + QString::fromStdString(std::to_string(appManager_->Get_Spectrometer()->Get_scans_to_average())));
     });
 
     QObject::connect(btn_acquire_spectro, &QPushButton::clicked, [&]() {
@@ -435,12 +437,12 @@ void MainWindow::saving_spectrum(std::vector<double> spectrum, std::vector<doubl
         data.push_back("+++++++++++++++++++++++++");
         data.push_back("DATE : " + QDateTime::currentDateTime().toString("yyyy/MM/dd_hh-mm-ss").toStdString());
         data.push_back("Spectrometer serial number : " + appManager_->Get_Spectrometer()->Get_serial_number());
-        data.push_back("Integration Time : " + appManager_->Get_Spectrometer()->Get_integration_time());
-        data.push_back("Spectral averaged : " + appManager_->Get_Spectrometer()->Get_scans_to_average());
-        data.push_back("Number of pixel in file : 2048");
-        data.push_back("begin : " + std::to_string(wavelengths[0]) + " nm");
-        data.push_back("end : " + std::to_string(wavelengths[wavelengths.size()-1]) + " nm");
-        data.push_back("Temperature : Unknow");
+        data.push_back("Integration Time : " + std::to_string(appManager_->Get_Spectrometer()->Get_integration_time()));
+        data.push_back("Spectral averaged : " + std::to_string(appManager_->Get_Spectrometer()->Get_scans_to_average()));
+        // data.push_back("Number of pixel in file : 2048");
+        // data.push_back("begin : " + std::to_string(wavelengths[0]) + " nm");
+        // data.push_back("end : " + std::to_string(wavelengths[wavelengths.size()-1]) + " nm");
+        // data.push_back("Temperature : Unknow");
         data.push_back("+++++++++++++++++++++++++");
         int header_lentgth = data.size();
         data.push_back("nm\\time");
