@@ -57,9 +57,9 @@ MainWindow::MainWindow(AppManager* appManager, QWidget *parent)
     btn_save_images = new QPushButton("Start Rec");
     label_periode = new QLabel("Acquire Timing :");
     spin_periode = new QSpinBox();
-    spin_periode->setMinimum(MIN_ACQUIRE_TIME);
-    spin_periode->setMaximum(1000000);
-    spin_periode->setSuffix(" ms");
+    spin_periode->setMinimum(MIN_ACQUIRE_TIME/1000);
+    spin_periode->setMaximum(1000);
+    spin_periode->setSuffix(" s");
     btn_recenter_cross = new QPushButton("Recenter crosses");
     btn_align_crosses = new QPushButton("Align crosses");
     btn_reset_images = new QPushButton("Cancel alignment");
@@ -245,7 +245,7 @@ MainWindow::MainWindow(AppManager* appManager, QWidget *parent)
     });
 
     QObject::connect(spin_periode, &QSpinBox::valueChanged, [&](long value) {
-        Set_Time_between_save(value);
+        Set_Time_between_save(value * 1000);
     });
 
     QObject::connect(slider_exposure_time, &QSlider::valueChanged, [&](int value) {
