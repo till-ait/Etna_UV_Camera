@@ -11,6 +11,7 @@
 class UserInterface;
 class InputHandler;
 class CameraControler;
+class SpectroControler;
 
 class AppManager {
 public :
@@ -29,11 +30,14 @@ public :
 
     InputHandler* Get_InputHandler();
 
+    SpectroControler* Get_Spectrometer();
+
 private :
     std::vector<CameraControler*>* Cameras;
     std::atomic<bool> is_running;
     UserInterface* userInterface_;
     InputHandler* inputHandler_;
+    SpectroControler* spectrometer;
 };
 
 #endif

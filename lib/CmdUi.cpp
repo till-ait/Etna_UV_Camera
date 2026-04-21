@@ -89,6 +89,10 @@ void CmdUi::Push_Frame(std::string* source_Name, uint8_t *data, uint32_t width, 
     new OutputPackage(appManager_, source_Name, data, width, height);
 }
 
+void CmdUi::Push_Spectrum(std::vector <double> spectrum, std::vector <double> wavelengths) {
+    std::cout << "Spectrum in this ui not" << std::endl;
+}
+
 void CmdUi::Ui_Print(std::string msg) {
     new OutputPackage(appManager_, new std::string(msg));
 }

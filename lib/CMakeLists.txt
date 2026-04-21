@@ -37,6 +37,12 @@ add_library(MainWindow
 add_library(CamView
             CamView.cpp)
 
+add_library(SpectroControler
+            SpectroControler.cpp)
+
+add_library(CSV_file_manager
+            CSV_file_manager.cpp)
+
 target_include_directories(hal_UV_Cam PUBLIC 
                             ${CMAKE_CURRENT_SOURCE_DIR}
                             ${EBUS_INCLUDE_DIR})
@@ -70,12 +76,12 @@ target_link_libraries(QtUi PUBLIC Qt6::Widgets)
 target_include_directories(MainWindow PUBLIC 
                             ${CMAKE_CURRENT_SOURCE_DIR})
 
-target_link_libraries(MainWindow PUBLIC Qt6::Widgets)                            
+target_link_libraries(MainWindow PUBLIC Qt6::Widgets Qt6::Gui Qt6::Core Qt6::Charts)                            
                             
 target_include_directories(CamView PUBLIC 
                             ${CMAKE_CURRENT_SOURCE_DIR})
 
-target_link_libraries(CamView PUBLIC Qt6::Widgets)                            
+target_link_libraries(CamView PUBLIC Qt6::Widgets)                  
                             
 target_include_directories(InputHandler PUBLIC 
                             ${CMAKE_CURRENT_SOURCE_DIR})
@@ -94,3 +100,11 @@ target_include_directories(CameraControler PUBLIC
                             ${EBUS_INCLUDE_DIR})
 
 target_link_directories(CameraControler PUBLIC ${EBUS_LIB_DIR})
+
+target_include_directories(SpectroControler PUBLIC 
+                            ${CMAKE_CURRENT_SOURCE_DIR})
+
+target_link_libraries(SpectroControler PUBLIC winusb setupapi)    
+                            
+target_include_directories(CSV_file_manager PUBLIC 
+                            ${CMAKE_CURRENT_SOURCE_DIR})

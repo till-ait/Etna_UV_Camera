@@ -11,13 +11,16 @@
 #include <QSpinBox>
 #include <QGroupBox>
 #include <QSlider>
+#include <QtCharts/QChartView>
+#include <QtCharts/QLineSeries>
+#include <QCheckBox>
 #include <string>
 
 #define DEFAULT_PERIODE 10000
 #define MIN_ACQUIRE_TIME 2000    // 63
 
-#define CAMLAYOUT_STRENGTH 4
-#define SPECTROMETERLAYOUT_STRENGTH 1
+#define CAMLAYOUT_STRENGTH 6
+#define SPECTROMETERLAYOUT_STRENGTH 4
 #define CAMBTLAYOUT_STRENGTH 1
 #define VIDEOLAYOUT_STRENGTH 5
 
@@ -27,6 +30,7 @@
 
 class AppManager;
 class CamView;
+class CSV_file_manager;
 
 
 class MainWindow : public QWidget {
@@ -39,14 +43,18 @@ public:
 
 public slots:
     void onNewFrame(QString sourceName, QImage image);
+    void onNewSpectrum(std::vector<double> spectrum, std::vector<double> wavelengths);
     void printQt(QString msg);
 
 private:
     bool save_images;
+    bool save_spectrum;
     long time_between_save_ms;
     std::chrono::steady_clock::time_point time_last_save_cam330;
     std::chrono::steady_clock::time_point time_last_save_cam310;
+    std::chrono::steady_clock::time_point time_last_save_spectrum;
     QString save_folder;
+    CSV_file_manager *csv_file;
 
     AppManager* appManager_;
 
@@ -54,9 +62,10 @@ private:
 
     QHBoxLayout *CamLayout;
     QVBoxLayout *CamBtLayout;
-    QVBoxLayout *CamVideoLayout;
+    QHBoxLayout *CamVideoLayout;
     
     QHBoxLayout *SpectrometerLayout;
+    QVBoxLayout *SpectrometerBtnLayout;
     QVBoxLayout *SpectrometerBtLayout;
     QVBoxLayout *SpectrometerVideoLayout;
 
@@ -76,7 +85,20 @@ private:
     QSlider *slider_gain;
     QLabel *label_diff_gain;
     QSlider *slider_diff_gain;
+    QCheckBox *checkBoxExposure;
+    QCheckBox *checkBoxMasterGain;
+    QCheckBox *checkBoxDiffGain;
     QPushButton *btn_exit;
+
+    QPushButton *btn_connect_spectro;
+    QPushButton *btn_acquire_spectro;
+    QCheckBox *checkBox_spectro_gain;
+    QSlider *slider_spectro_gain;
+    QCheckBox *checkBox_spectro_averaging;
+    QSlider *slider_spectro_averaging;
+    QLineSeries *series_spectro;
+    QChart *chart_spectro;
+    QChartView *chartView;
 
     QVBoxLayout *layout_cam330;
     QVBoxLayout *layout_cam310;
@@ -93,6 +115,7 @@ private:
     void Save_images_activation();
     void align_crosses();
     void update_gain();
+    void saving_spectrum(std::vector<double> spectrum, std::vector<double> wavelengths);
 
     int image_cam330_counter;
     int image_cam310_counter;
