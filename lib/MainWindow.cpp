@@ -435,17 +435,20 @@ void MainWindow::saving_spectrum(std::vector<double> spectrum, std::vector<doubl
     if(csv_file->Is_empty()) {
         std::vector<std::string> data;
         data.push_back("+++++++++++++++++++++++++");
-        data.push_back("DATE : " + QDateTime::currentDateTime().toString("yyyy/MM/dd_hh:mm:ss").toStdString());
+        data.push_back("Model : Unknown");
+        data.push_back("Date : " + QDateTime::currentDateTime().toString("yyyy/MM/dd_hh:mm:ss").toStdString());
         data.push_back("Spectrometer serial number : " + appManager_->Get_Spectrometer()->Get_serial_number());
         data.push_back("Integration Time : " + std::to_string(appManager_->Get_Spectrometer()->Get_integration_time()));
-        data.push_back("Spectral averaged : " + std::to_string(appManager_->Get_Spectrometer()->Get_scans_to_average()));
-        // data.push_back("Number of pixel in file : 2048");
-        // data.push_back("begin : " + std::to_string(wavelengths[0]) + " nm");
-        // data.push_back("end : " + std::to_string(wavelengths[wavelengths.size()-1]) + " nm");
-        // data.push_back("Temperature : Unknow");
+        data.push_back("Spectral coadding : " + std::to_string(appManager_->Get_Spectrometer()->Get_scans_to_average()));
+        data.push_back("bandwidth (nm) : " + std::to_string(wavelengths[0])+ " - " + std::to_string(wavelengths[wavelengths.size()-1]));
+        data.push_back("Calibration coef 1 : ");
+        data.push_back("Calibration coef 2 : ");
+        data.push_back("Calibration coef 3 : ");
+        data.push_back("Calibration coef 4 : ");
+        // data.push_back("Temperature : Unknown");
         data.push_back("+++++++++++++++++++++++++");
         int header_lentgth = data.size();
-        data.push_back("nm\\time");
+
         for(double value : wavelengths) {
             data.push_back(std::to_string(value));
         }
@@ -453,7 +456,6 @@ void MainWindow::saving_spectrum(std::vector<double> spectrum, std::vector<doubl
     }
     
     std::vector<std::string> data;
-    data.push_back(QDateTime::currentDateTime().toString("hh/mm/ss").toStdString());
     for(double value : spectrum) {
         data.push_back(std::to_string(value));
     }
