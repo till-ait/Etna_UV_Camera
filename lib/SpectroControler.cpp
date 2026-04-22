@@ -158,15 +158,9 @@ bool SpectroControler::Set_scans_to_average(uint16_t scans)
 {
     scans_average = scans;
 
-    if(!is_connected) {
-        return false;
-    }
-    
-    uint8_t cmd[3];
-    cmd[0] = CMD_SET_SCANS_AVG;
-    cmd[1] = (scans_average >> 0) & 0xFF;
-    cmd[2] = (scans_average >> 8) & 0xFF;
-    return WinUsb_WritePipe(usbHandle, EP_OUT, cmd, 3, &transferred, NULL);
+    alpha_coef = smoothingToAlpha(scans);
+
+    return true;
 }
 
 bool SpectroControler::Set_trigger_mode(uint8_t mode) {
@@ -180,7 +174,7 @@ void SpectroControler::Get_spectrum() {
     while((appManager_->Get_Is_Running()) && (is_streaming)) {
         uint8_t cmd[1] = { CMD_REQUEST_SPECTRUM };
         WinUsb_WritePipe(usbHandle, EP_OUT, cmd, 1, &transferred, NULL);
-        Sleep(integration_time/1000.0 * scans_average + 10);
+        Sleep(integration_time/1000.0 * + 10);
 
         // pixels 16-bit little-endian
         int total_bytes = SPECTRUM_PIXELS * 2;
@@ -264,8 +258,8 @@ void SpectroControler::Get_spectrum() {
             uint16_t val = (uint16_t)(raw[2*i] | (raw[2*i+1] << 8));
             // spectrum[i] = static_cast<double> (val);
             // spectrum[i] = 20*(std::log10(static_cast<double> (val)));
-            // average_spectrum[i] = (1-alpha_coef)*average_spectrum[i] + (alpha_coef)*val;
-            average_spectrum[i] = val;
+            average_spectrum[i] = (1-alpha_coef)*average_spectrum[i] + (alpha_coef)*val;
+            // average_spectrum[i] = val;
         }
 
         ProcessSpectrum(average_spectrum, wavelengths, intensities);
@@ -368,4 +362,16 @@ int SpectroControler::Get_scans_to_average() {
 
 std::string SpectroControler::Get_serial_number() {
     return serial_number;
+}
+
+double SpectroControler::smoothingToAlpha(int level) {
+    if (level < 1)   level = 1;
+
+    if (level == 1) return 1.0;
+
+    double N = static_cast<double>(level);
+
+    double alpha = 1.0 - std::exp(-1.0 / N);
+
+    return alpha;
 }

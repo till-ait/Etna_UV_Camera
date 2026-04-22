@@ -67,6 +67,7 @@ public :
     void stop_Acquire();
     void LoadCalibration();
     double Get_calibration_coef(int index);
+    double smoothingToAlpha(int level);
     std::string ReadEEPROM(uint8_t slot);
     double PixelToWavelength(int p);
     void ProcessSpectrum(const std::vector<double>& raw, std::vector<double>& wavelengths, std::vector<double>& intensities);
