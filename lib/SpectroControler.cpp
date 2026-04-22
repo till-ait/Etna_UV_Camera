@@ -120,14 +120,6 @@ bool SpectroControler::Connect() {
     }
 
     serial_number = std::string(reinterpret_cast<char*>(cmdBufIn + 2), 15);
-    std::cout << "Serial : " << serial_number << std::endl;
-    // std::ostringstream oss;
-    // for (int i = 0; i < 0 + 15; i++) {
-    //     oss << std::hex << std::uppercase
-    //         << std::setw(2) << std::setfill('0')
-    //         << static_cast<int>(cmdBufIn[i]);
-    // }
-    // serial_number = oss.str();
 
     is_connected = true;
 
