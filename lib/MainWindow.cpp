@@ -152,7 +152,7 @@ MainWindow::MainWindow(AppManager* appManager, QWidget *parent)
     checkBox_spectro_averaging = new QCheckBox("CoAdd : " + QString::fromStdString(std::to_string(appManager_->Get_Spectrometer()->Get_scans_to_average())));
     slider_spectro_averaging = new QSlider(Qt::Horizontal);
     slider_spectro_averaging->setMinimum(1);
-    slider_spectro_averaging->setMaximum(100);
+    slider_spectro_averaging->setMaximum(300);
     slider_spectro_averaging->setValue(1);
     slider_spectro_averaging->setSingleStep(1);
     slider_spectro_averaging->setPageStep(1);
