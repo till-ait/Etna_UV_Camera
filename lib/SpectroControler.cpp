@@ -326,6 +326,10 @@ void SpectroControler::LoadCalibration() {
     //           << " C2=" << wl_coef[2] << " C3=" << wl_coef[3] << std::endl;
 }
 
+double SpectroControler::Get_calibration_coef(int index) {
+    return wl_coef[index];
+}
+
 double SpectroControler::PixelToWavelength(int p) {
     return wl_coef[0]
          + wl_coef[1] * p
