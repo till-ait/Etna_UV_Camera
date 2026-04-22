@@ -104,7 +104,7 @@ bool SpectroControler::Connect() {
     Sleep(2000);
 
     memset(cmdBufOut, 0, CMD_BUF_LENGTH);
-    cmdBufOut[0] = CMD_QUERY_INFO;
+    cmdBufOut[0] = CMD_QUERY_EEPROM;
     cmdBufOut[1] = 0x00;
     trasfert_result = WinUsb_WritePipe(usbHandle, EP_OUT, cmdBufOut, 2, &transferred, NULL);
     if(!trasfert_result) {
@@ -119,15 +119,15 @@ bool SpectroControler::Connect() {
         return false;
     }
 
-    // serial_number = std::string(reinterpret_cast<char*>(cmdBufIn + 2), 15);
-    // std::cout << "Serial : " << serial_number << std::endl;
-    std::ostringstream oss;
-    for (int i = 2; i < 2 + 15; i++) {
-        oss << std::hex << std::uppercase
-            << std::setw(2) << std::setfill('0')
-            << static_cast<int>(cmdBufIn[i]);
-    }
-    serial_number = oss.str();
+    serial_number = std::string(reinterpret_cast<char*>(cmdBufIn + 2), 15);
+    std::cout << "Serial : " << serial_number << std::endl;
+    // std::ostringstream oss;
+    // for (int i = 0; i < 0 + 15; i++) {
+    //     oss << std::hex << std::uppercase
+    //         << std::setw(2) << std::setfill('0')
+    //         << static_cast<int>(cmdBufIn[i]);
+    // }
+    // serial_number = oss.str();
 
     is_connected = true;
 
@@ -272,7 +272,8 @@ void SpectroControler::Get_spectrum() {
             uint16_t val = (uint16_t)(raw[2*i] | (raw[2*i+1] << 8));
             // spectrum[i] = static_cast<double> (val);
             // spectrum[i] = 20*(std::log10(static_cast<double> (val)));
-            average_spectrum[i] = (1-alpha_coef)*average_spectrum[i] + (alpha_coef)*val;
+            // average_spectrum[i] = (1-alpha_coef)*average_spectrum[i] + (alpha_coef)*val;
+            average_spectrum[i] = val;
         }
 
         ProcessSpectrum(average_spectrum, wavelengths, intensities);
