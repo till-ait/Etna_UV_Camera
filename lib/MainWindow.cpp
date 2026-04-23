@@ -434,9 +434,9 @@ void MainWindow::saving_spectrum(std::vector<double> spectrum, std::vector<doubl
 
     if(csv_file->Is_empty()) {
         std::vector<std::string> data;
-        data.push_back("+++++++++++++++++++++++++");
         data.push_back("Model : Unknown");
         data.push_back("Date : " + QDateTime::currentDateTime().toString("yyyy/MM/dd_hh:mm:ss").toStdString());
+        data.push_back("Spectrum counter : " + std::to_string(spectrum_counter));
         data.push_back("Spectrometer serial number : " + appManager_->Get_Spectrometer()->Get_serial_number());
         data.push_back("Integration Time : " + std::to_string(appManager_->Get_Spectrometer()->Get_integration_time()));
         data.push_back("Spectral coadding : " + std::to_string(appManager_->Get_Spectrometer()->Get_scans_to_average()));
