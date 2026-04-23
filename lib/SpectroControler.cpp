@@ -174,7 +174,7 @@ void SpectroControler::Get_spectrum() {
     while((appManager_->Get_Is_Running()) && (is_streaming)) {
         uint8_t cmd[1] = { CMD_REQUEST_SPECTRUM };
         WinUsb_WritePipe(usbHandle, EP_OUT, cmd, 1, &transferred, NULL);
-        Sleep(integration_time/1000.0 * + 10);
+        Sleep(integration_time/1000.0 + 10);
 
         // pixels 16-bit little-endian
         int total_bytes = SPECTRUM_PIXELS * 2;

@@ -6,6 +6,8 @@
 #include <QMouseEvent>
 #include <QPainter>
 #include <thread>
+#include <cmath>
+#include <algorithm>
 #include "CamView.h"
 #include "CameraControler.h"
 #include "SpectroControler.h"
@@ -153,7 +155,7 @@ MainWindow::MainWindow(AppManager* appManager, QWidget *parent)
     checkBox_spectro_gain = new QCheckBox("IntTime : " + QString::fromStdString(std::to_string(appManager_->Get_Spectrometer()->Get_integration_time())));
     slider_spectro_gain = new QSlider(Qt::Horizontal);
     slider_spectro_gain->setMinimum(500);
-    slider_spectro_gain->setMaximum(60000);
+    slider_spectro_gain->setMaximum(1000);
     slider_spectro_gain->setValue(500);
     slider_spectro_gain->setSingleStep(1);
     slider_spectro_gain->setPageStep(1);
@@ -339,9 +341,12 @@ MainWindow::MainWindow(AppManager* appManager, QWidget *parent)
         }
     });
 
-    QObject::connect(slider_spectro_gain, &QSlider::valueChanged, [&](int value) {
+    QObject::connect(slider_spectro_gain, &QSlider::sliderReleased, [&]() {
+        int value = slider_spectro_gain->value();
+        double integ_time = 0.0;
+        if (value > 0.0) integ_time = std::pow(10.0, (value / 1000.0) * 7.778151250383644); //7.778151250383644 = log10(60_000_000)
         if(appManager_->Get_Spectrometer()->Is_Connected()){
-            appManager_->Get_Spectrometer()->Set_integration_time(value);
+            appManager_->Get_Spectrometer()->Set_integration_time(integ_time);
         }
         checkBox_spectro_gain->setText("IntTime : " + QString::fromStdString(std::to_string(appManager_->Get_Spectrometer()->Get_integration_time())));
     });
