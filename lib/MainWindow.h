@@ -40,6 +40,7 @@ public:
     MainWindow(AppManager* appManager, QWidget *parent = nullptr);
 
     void Set_Time_between_save(long value);
+    void Set_Time_between_save_spectro(long value);
 
 public slots:
     void onNewFrame(QString sourceName, QImage image);
@@ -49,8 +50,10 @@ public slots:
 private:
     bool save_images;
     bool pause_save_image;
+    bool pause_save_spectro;
     bool save_spectrum;
     long time_between_save_ms;
+    long time_between_save_ms_spectro;
     std::chrono::steady_clock::time_point time_last_save_cam330;
     std::chrono::steady_clock::time_point time_last_save_cam310;
     std::chrono::steady_clock::time_point time_last_save_spectrum;
@@ -75,8 +78,8 @@ private:
     QPushButton *btn_select_save_folder;
     QPushButton *btn_save_images;
     QPushButton *btn_pause_save_images;
-    QLabel *label_periode;
-    QSpinBox *spin_periode;
+    QLabel *label_periode_image;
+    QSpinBox *spin_periode_image;
     QPushButton *btn_recenter_cross;
     QPushButton *btn_align_crosses;
     QPushButton *btn_reset_images;
@@ -93,6 +96,9 @@ private:
 
     QPushButton *btn_connect_spectro;
     QPushButton *btn_acquire_spectro;
+    QPushButton *btn_pause_save_spectro;
+    QLabel *label_periode_spectro;
+    QSpinBox *spin_periode_spectro;
     QCheckBox *checkBox_spectro_gain;
     QSlider *slider_spectro_gain;
     QCheckBox *checkBox_spectro_averaging;
