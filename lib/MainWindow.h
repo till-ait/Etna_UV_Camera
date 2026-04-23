@@ -54,6 +54,7 @@ private:
     bool save_spectrum;
     long time_between_save_ms;
     long time_between_save_ms_spectro;
+    int spectrum_counter;
     std::chrono::steady_clock::time_point time_last_save_cam330;
     std::chrono::steady_clock::time_point time_last_save_cam310;
     std::chrono::steady_clock::time_point time_last_save_spectrum;
@@ -103,6 +104,7 @@ private:
     QSlider *slider_spectro_gain;
     QCheckBox *checkBox_spectro_averaging;
     QSlider *slider_spectro_averaging;
+    QLabel *counter_spectrum_rec;
     QLineSeries *series_spectro;
     QChart *chart_spectro;
     QChartView *chartView;

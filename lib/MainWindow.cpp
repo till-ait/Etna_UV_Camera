@@ -27,6 +27,7 @@ MainWindow::MainWindow(AppManager* appManager, QWidget *parent)
     save_folder = "";
     image_cam330_counter = 0;
     image_cam310_counter = 0;
+    spectrum_counter = 0;
 
     master_gain = 1.0;
     diff_gain = 0.0;
@@ -95,7 +96,7 @@ MainWindow::MainWindow(AppManager* appManager, QWidget *parent)
     slider_diff_gain->setSingleStep(1);
     slider_diff_gain->setPageStep(1);
     slider_diff_gain->setEnabled(false);
-    counter_image_rec = new QLabel("Acquire counter : ");
+    counter_image_rec = new QLabel("Acquire counter : 0");
 
     CamBtLayout->addWidget(btn_connect_cam330);
     CamBtLayout->addWidget(btn_connect_cam310);
@@ -165,6 +166,7 @@ MainWindow::MainWindow(AppManager* appManager, QWidget *parent)
     slider_spectro_averaging->setSingleStep(1);
     slider_spectro_averaging->setPageStep(1);
     slider_spectro_averaging->setEnabled(false);
+    counter_spectrum_rec = new QLabel("Acquire counter : 0");
     series_spectro = new QLineSeries();
     series_spectro->setPen(QPen(Qt::black, 1));
     chart_spectro = new QChart();
@@ -185,6 +187,7 @@ MainWindow::MainWindow(AppManager* appManager, QWidget *parent)
     SpectrometerBtnLayout->addWidget(slider_spectro_gain);
     SpectrometerBtnLayout->addWidget(checkBox_spectro_averaging);
     SpectrometerBtnLayout->addWidget(slider_spectro_averaging);
+    SpectrometerBtnLayout->addWidget(counter_spectrum_rec);
     SpectrometerBtnLayout->addStretch();
     SpectrometerLayout->addLayout(SpectrometerBtnLayout, 1);
     SpectrometerLayout->addWidget(chartView, 5);
@@ -364,6 +367,8 @@ MainWindow::MainWindow(AppManager* appManager, QWidget *parent)
             pause_save_spectro = false;
             btn_acquire_spectro->setText("Start Rec");
             btn_pause_save_spectro->setText("Pause Rec");
+            counter_spectrum_rec->setText("Acquire counter : 0");
+            spectrum_counter = 0;
             return;
         }
 
@@ -421,6 +426,9 @@ void MainWindow::onNewSpectrum(std::vector<double> spectrum, std::vector<double>
 }
 
 void MainWindow::saving_spectrum(std::vector<double> spectrum, std::vector<double> wavelengths) {
+    spectrum_counter++;
+    counter_spectrum_rec->setText("Acquire counter : " + QString::number(spectrum_counter));
+
     QString csv_name = "Spetrum_" + QDateTime::currentDateTime().toString("yyyyMMdd_hhmmss_zzz") + ".csv";
     csv_file = new CSV_file_manager(csv_name.toStdString(), save_folder.toStdString());
 
@@ -539,6 +547,7 @@ void MainWindow::Save_images_activation(){
         
         image_cam330_counter = 0;
         image_cam310_counter = 0;
+        counter_image_rec->setText("Acquire counter : 0");
 
         img_cam330->Set_is_reccorded(true);
         img_cam310->Set_is_reccorded(true);
