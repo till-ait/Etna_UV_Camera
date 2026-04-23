@@ -90,7 +90,6 @@ private:
     QCheckBox *checkBoxExposure;
     QCheckBox *checkBoxMasterGain;
     QCheckBox *checkBoxDiffGain;
-    QPushButton *btn_exit;
 
     QPushButton *btn_connect_spectro;
     QPushButton *btn_acquire_spectro;

@@ -65,7 +65,6 @@ MainWindow::MainWindow(AppManager* appManager, QWidget *parent)
     btn_recenter_cross = new QPushButton("Recenter crosses");
     btn_align_crosses = new QPushButton("Align crosses");
     btn_reset_images = new QPushButton("Cancel alignment");
-    btn_exit = new QPushButton("Exit");
     label_exposure_time = new QLabel("Time Exposure :");
     checkBoxExposure = new QCheckBox("Time Exposure :");
     slider_exposure_time = new QSlider(Qt::Horizontal);
@@ -115,7 +114,6 @@ MainWindow::MainWindow(AppManager* appManager, QWidget *parent)
     CamBtLayout->addWidget(slider_diff_gain);
     CamBtLayout->addStretch();
     CamBtLayout->addWidget(counter_image_rec);
-    CamBtLayout->addWidget(btn_exit);
     group_cameras_control->setLayout(CamBtLayout);
     CamLayout->addWidget(group_cameras_control, CAMBTLAYOUT_STRENGTH);
 
@@ -191,16 +189,6 @@ MainWindow::MainWindow(AppManager* appManager, QWidget *parent)
 
     // Quit cross
     QObject::connect(qApp, &QApplication::lastWindowClosed, [&]() {
-        appManager_->Get_InputHandler()->Get_InputQueue()->push(new std::string("exit"));
-        if(csv_file != NULL){
-            if(!csv_file->is_saved()){
-                csv_file->save();
-            }
-        }
-        qApp->quit();
-    });
-
-    QObject::connect(btn_exit, &QPushButton::clicked, [&]() {
         appManager_->Get_InputHandler()->Get_InputQueue()->push(new std::string("exit"));
         if(csv_file != NULL){
             if(!csv_file->is_saved()){
