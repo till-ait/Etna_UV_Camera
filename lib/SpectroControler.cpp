@@ -160,16 +160,6 @@ bool SpectroControler::Disconnect() {
     is_connected = false;
     serial_number = "Unknown";
 
-    // if(usbHandleInitialized){
-    //     WinUsb_Free(usbHandle);
-    // }
-
-    // if(deviceHandle != INVALID_HANDLE_VALUE){
-    //     CloseHandle(deviceHandle);
-    // }
-
-    // is_connected = false;
-
     return true;
 }
 
