@@ -21,7 +21,7 @@ SpectroControler::SpectroControler(AppManager *_appManager_) {
     thread_acquire = NULL;
     is_streaming = false;
     serial_number = "Unknown";
-    HANDLE deviceHandle = INVALID_HANDLE_VALUE;
+    deviceHandle = INVALID_HANDLE_VALUE;
     usbHandleInitialized = false;
 }
 
@@ -47,7 +47,7 @@ bool SpectroControler::Connect() {
 
     deviceInfo = SetupDiGetClassDevs(
         &WINUSB_GUID, NULL, NULL, DIGCF_PRESENT | DIGCF_DEVICEINTERFACE);
-    HANDLE deviceHandle = INVALID_HANDLE_VALUE;
+    deviceHandle = INVALID_HANDLE_VALUE;
     SP_DEVICE_INTERFACE_DATA ifaceData = {};
     ifaceData.cbSize = sizeof(SP_DEVICE_INTERFACE_DATA);
 
@@ -130,6 +130,45 @@ bool SpectroControler::Connect() {
     LoadCalibration();
 
     start_Acquire();
+
+    return true;
+}
+
+bool SpectroControler::Disconnect() {
+    if(!is_connected) return true;
+
+    stop_Acquire();
+    
+    if (usbHandleInitialized) {
+        if (usbHandle != INVALID_HANDLE_VALUE) {
+            WinUsb_AbortPipe(usbHandle, EP_OUT);
+            WinUsb_AbortPipe(usbHandle, EP_IN_DATA_1);
+            WinUsb_AbortPipe(usbHandle, EP_IN_DATA_2);
+            WinUsb_AbortPipe(usbHandle, EP_IN_CMD);
+
+            WinUsb_Free(usbHandle);
+            usbHandle = INVALID_HANDLE_VALUE;
+        }
+        usbHandleInitialized = false;
+    }
+
+    if (deviceHandle != INVALID_HANDLE_VALUE) {
+        CloseHandle(deviceHandle);
+        deviceHandle = INVALID_HANDLE_VALUE;
+    }
+
+    is_connected = false;
+    serial_number = "Unknown";
+
+    // if(usbHandleInitialized){
+    //     WinUsb_Free(usbHandle);
+    // }
+
+    // if(deviceHandle != INVALID_HANDLE_VALUE){
+    //     CloseHandle(deviceHandle);
+    // }
+
+    // is_connected = false;
 
     return true;
 }
@@ -255,6 +294,7 @@ void SpectroControler::stop_Acquire() {
     is_streaming = false;
     if(thread_acquire != NULL) {
         thread_acquire->join();
+        thread_acquire = NULL;
     }
 }
 

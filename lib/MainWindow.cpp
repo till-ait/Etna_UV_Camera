@@ -141,6 +141,7 @@ MainWindow::MainWindow(AppManager* appManager, QWidget *parent)
     img_spectro->setAlignment(Qt::AlignCenter);
     img_spectro->setMinimumSize(600, 100);
     btn_connect_spectro = new QPushButton("Connect Spectro");
+    btn_disconnect_spectro = new QPushButton("Disconnect Spectro");
     btn_acquire_spectro = new QPushButton("Start Rec");
     btn_pause_save_spectro = new QPushButton("Pause Rec");
     label_periode_spectro = new QLabel("Acquire Timing :");
@@ -178,6 +179,7 @@ MainWindow::MainWindow(AppManager* appManager, QWidget *parent)
     chartView = new QChartView(chart_spectro);
     chartView->setRenderHint(QPainter::Antialiasing);
     SpectrometerBtnLayout->addWidget(btn_connect_spectro);
+    SpectrometerBtnLayout->addWidget(btn_disconnect_spectro);
     SpectrometerBtnLayout->addWidget(label_periode_spectro);
     SpectrometerBtnLayout->addWidget(spin_periode_spectro);
     SpectrometerBtnLayout->addWidget(btn_acquire_spectro);
@@ -223,6 +225,10 @@ MainWindow::MainWindow(AppManager* appManager, QWidget *parent)
 
     QObject::connect(btn_connect_spectro, &QPushButton::clicked, [&]() {
         appManager_->Get_InputHandler()->Get_InputQueue()->push(new std::string("connect spectro"));
+    });
+
+    QObject::connect(btn_disconnect_spectro, &QPushButton::clicked, [&]() {
+        appManager_->Get_Spectrometer()->Disconnect();
     });
 
     QObject::connect(btn_select_save_folder, &QPushButton::clicked, [&]() {

@@ -55,6 +55,7 @@ public :
     ~SpectroControler();
 
     bool Connect();
+    bool Disconnect();
     bool Is_Connected();
     bool Set_integration_time(uint32_t micros);
     int Get_integration_time();

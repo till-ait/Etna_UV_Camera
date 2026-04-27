@@ -96,6 +96,7 @@ private:
     QCheckBox *checkBoxDiffGain;
 
     QPushButton *btn_connect_spectro;
+    QPushButton *btn_disconnect_spectro;
     QPushButton *btn_acquire_spectro;
     QPushButton *btn_pause_save_spectro;
     QLabel *label_periode_spectro;
