@@ -94,7 +94,6 @@ bool CameraControler::Try_Connection() {
     
     device_GEV->NegotiatePacketSize();
 
-    // Configure device streaming destination
     device_GEV->SetStreamDestination( stream_GEV->GetLocalIPAddress(), stream_GEV->GetLocalPort() );
     
     data.is_connected = true;
@@ -105,10 +104,8 @@ bool CameraControler::Try_Connection() {
 
 void CameraControler::Create_Stream_Buffers()
 {
-    // Reading payload size from device
     uint32_t lSize = device->GetPayloadSize();
     
-    // Use BUFFER_COUNT or the maximum number of buffers, whichever is smaller
     uint32_t buffer_count = ( stream->GetQueuedBufferMaximum() < BUFFER_COUNT ) ? 
     stream->GetQueuedBufferMaximum() :
     BUFFER_COUNT;
@@ -122,7 +119,6 @@ void CameraControler::Create_Stream_Buffers()
         buffer_list->push_back( buffer );
     }
     
-    // Queue all buffers in the stream
     std::list<PvBuffer *>::iterator lIt = buffer_list->begin();
     while ( lIt != buffer_list->end() )
     {
@@ -153,7 +149,6 @@ void CameraControler::Acquire_Images() {
     PvGenCommand *lStart = dynamic_cast<PvGenCommand *>( lDeviceParams->Get( "AcquisitionStart" ) );
     PvGenCommand *lStop = dynamic_cast<PvGenCommand *>( lDeviceParams->Get( "AcquisitionStop" ) );
 
-    // Get stream parameters
     PvGenParameterArray *lStreamParams = stream->GetParameters();
 
     // Map a few GenICam stream stats counters
@@ -170,7 +165,6 @@ void CameraControler::Acquire_Images() {
         PvBuffer *lBuffer = NULL;
         PvResult lOperationResult;
 
-        // Retrieve next buffer
         PvResult lResult = stream->RetrieveBuffer( &lBuffer, &lOperationResult, 1000 );
 
         if (!lResult.IsOK()){

@@ -25,7 +25,6 @@ void CmdUi::Update_Output() {
     while(appManager_->Get_Is_Running()) {
         current_output = outputQueue->pop();
 
-        // If too many image in the queue skip
         if((current_output->Get_P_Image_Buffer() != nullptr)
             && (outputQueue->size() < 10)) {
 
@@ -41,7 +40,6 @@ void CmdUi::Update_Output() {
             }
         }
 
-        // TODO : faire en sorte qu'il affiche la structur des parametre de la cam ou spectro
         if(current_output->Get_P_Data_Buffer() != nullptr) {
             std::cout << "Data : " 
             << *(current_output->Get_P_Data_Buffer()) 

@@ -13,7 +13,7 @@ width(_width), height(_height),
 p_data_buffer(_p_data_buffer),display_msg(_display_msg) 
 {
     if (_p_image_buffer != nullptr && _width > 0 && _height > 0) {
-        uint32_t size = _width * _height; // Mono8 : 1 octet/pixel
+        uint32_t size = _width * _height; // Mono8 : 1 byte/pixel
         p_image_buffer = new uint8_t[size];
         memcpy(p_image_buffer, _p_image_buffer, size);
     } else {

@@ -109,13 +109,10 @@ MainWindow::MainWindow(AppManager* appManager, QWidget *parent)
     CamBtLayout->addWidget(spin_periode_image);
     CamBtLayout->addWidget(btn_save_images);
     CamBtLayout->addWidget(btn_pause_save_images);
-    // CamBtLayout->addWidget(label_exposure_time);
     CamBtLayout->addWidget(checkBoxExposure);
     CamBtLayout->addWidget(slider_exposure_time);
-    // CamBtLayout->addWidget(label_gain);
     CamBtLayout->addWidget(checkBoxMasterGain);
     CamBtLayout->addWidget(slider_gain);
-    // CamBtLayout->addWidget(label_diff_gain);
     CamBtLayout->addWidget(checkBoxDiffGain);
     CamBtLayout->addWidget(slider_diff_gain);
     CamBtLayout->addWidget(counter_image_rec);
@@ -193,7 +190,6 @@ MainWindow::MainWindow(AppManager* appManager, QWidget *parent)
     SpectrometerBtnLayout->addStretch();
     SpectrometerLayout->addLayout(SpectrometerBtnLayout, 1);
     SpectrometerLayout->addWidget(chartView, 5);
-    // SpectrometerLayout->addWidget(img_spectro);
         
     mainLayout->addLayout(CamLayout, CAMLAYOUT_STRENGTH);
 
@@ -412,10 +408,8 @@ void MainWindow::onNewSpectrum(std::vector<double> spectrum, std::vector<double>
     auto axisY = chart_spectro->axes(Qt::Vertical).first();
 
     double minY = *std::min_element(spectrum.begin(), spectrum.end());
-    // double maxY = *std::max_element(spectrum.begin(), spectrum.end());
 
     double maxY = 150.0;
-    // double maxY = 150.0;
     for(double value : spectrum) {
         if(value > maxY) maxY = value;
     }

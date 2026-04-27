@@ -191,45 +191,11 @@ void SpectroControler::Get_spectrum() {
                 std::this_thread::sleep_for(std::chrono::milliseconds(10));
             }
         }
-        // Sleep(integration_time/1000.0);
 
         // pixels 16-bit little-endian
         int total_bytes = SPECTRUM_PIXELS * 2;
         std::vector<uint8_t> raw(total_bytes*2, 0);
         int received = 0;
-
-        // while (received < total_bytes) {
-        //     uint8_t buf[512] = {};
-        //     ULONG n = 0;
-        //     // if (!WinUsb_ReadPipe(hWinUsb, EP_IN,
-        //     //         buf, sizeof(buf), &n, NULL))
-        //     //     break;
-
-        //     if(!WinUsb_ReadPipe(usbHandle, EP_IN_DATA_1, buf, sizeof(buf), &n, NULL)){ // TODO peut etre 
-        //         std::cout << "BREAK" << std::endl;
-        //         break;
-        //     }
-
-        //     // Paquet de synchronisation final (0x69)
-        //     if (n == 1 && buf[0] == 0x69) {
-        //         std::cout << "SYNC" << std::endl;
-        //         break;
-        //     }
-
-        //     int to_copy = (int)std::min((int)n, total_bytes - received);
-        //     std::memcpy(raw.data() + received, buf, to_copy);
-        //     received += to_copy;
-
-        //     std::cout << "Recived : " << received << std::endl;
-        // }
-
-        // // read synchro byte
-        // {
-        //     uint8_t sync[1] = {};
-        //     ULONG dummy = 0;
-        //     // WinUsb_ReadPipe(hWinUsb, EP_IN, sync, 1, &dummy, NULL);
-        //     WinUsb_ReadPipe(usbHandle, EP_IN_DATA_1, sync, 1, &dummy, NULL);
-        // }
 
         int i = 0;
         int end_point = EP_IN_DATA_2;
@@ -237,20 +203,16 @@ void SpectroControler::Get_spectrum() {
         while(!synch_byte_recived) {
             uint8_t buf[512] = {};
             ULONG n = 0;
-            // if (!WinUsb_ReadPipe(hWinUsb, EP_IN,
-            //         buf, sizeof(buf), &n, NULL))
-            //     break;
 
             if(i==4) {
                 end_point = EP_IN_DATA_1;
             }
 
-            if(!WinUsb_ReadPipe(usbHandle, end_point, buf, sizeof(buf), &n, NULL)){ // TODO peut etre 
-                // std::cout << "BREAK" << std::endl;
+            if(!WinUsb_ReadPipe(usbHandle, end_point, buf, sizeof(buf), &n, NULL)){
                 break;
             }
 
-            // Paquet de synchronisation final (0x69)
+            // synchronisation (0x69)
             if (n == 1 && buf[0] == 0x69) {
                 // std::cout << "SYNC" << std::endl;
                 synch_byte_recived = true;
@@ -258,33 +220,18 @@ void SpectroControler::Get_spectrum() {
                 int to_copy = (int)std::min((int)n, total_bytes*2 - received);
                 std::memcpy(raw.data() + received, buf, to_copy);
                 received += to_copy;
-                // std::cout << "BUF " << (int)buf[0] << std::endl;
             }
-            
-            // std::cout << "Recived : " << received << std::endl;
             i++;
         }
 
-
-        // std::cout << (uint16_t)(raw[2*2] | (raw[2*2+1] << 8)) << std::endl;
-
-        // uint16 LE → double
         std::vector<double> spectrum(received/2);
         std::vector<double> wavelengths, intensities;
         for (int i = 0; i < received/2; ++i) {
             uint16_t val = (uint16_t)(raw[2*i] | (raw[2*i+1] << 8));
-            // spectrum[i] = static_cast<double> (val);
-            // spectrum[i] = 20*(std::log10(static_cast<double> (val)));
             average_spectrum[i] = (1-alpha_coef)*average_spectrum[i] + (alpha_coef)*val;
-            // average_spectrum[i] = val;
         }
 
         ProcessSpectrum(average_spectrum, wavelengths, intensities);
-        // std::vector<double> spectrum(SPECTRUM_PIXELS);
-        // for (int i = 0; i < SPECTRUM_PIXELS; ++i) {
-        //     uint16_t val = (uint16_t)(raw[2*i] | (raw[2*i+1] << 8));
-        //     spectrum[i] = static_cast<double>(val);
-        // }
         
         if((appManager_->Get_Is_Running()) && (is_streaming)){
             appManager_->Get_UserInterface()->Push_Spectrum(intensities,wavelengths);
@@ -332,9 +279,6 @@ void SpectroControler::LoadCalibration() {
     wl_coef[1] = std::stod(s1);
     wl_coef[2] = std::stod(s2);
     wl_coef[3] = std::stod(s3);
-
-    // std::cout << "λ0=" << wl_coef[0] << " C1=" << wl_coef[1]
-    //           << " C2=" << wl_coef[2] << " C3=" << wl_coef[3] << std::endl;
 }
 
 double SpectroControler::Get_calibration_coef(int index) {
