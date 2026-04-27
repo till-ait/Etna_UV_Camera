@@ -2,6 +2,7 @@
 #include "AppManager.h"
 #include "UserInterface.h"
 #include <cmath>
+#include <ctime>
 
 
 
@@ -171,10 +172,26 @@ bool SpectroControler::Set_trigger_mode(uint8_t mode) {
 }
 
 void SpectroControler::Get_spectrum() {
+    bool is_sleeping = true;
+    auto start_time = std::chrono::system_clock::now();
     while((appManager_->Get_Is_Running()) && (is_streaming)) {
         uint8_t cmd[1] = { CMD_REQUEST_SPECTRUM };
         WinUsb_WritePipe(usbHandle, EP_OUT, cmd, 1, &transferred, NULL);
-        Sleep(integration_time/1000.0 + 10);
+        is_sleeping = true;
+        start_time = std::chrono::system_clock::now();
+        while(is_sleeping){
+            std::chrono::duration<double> elapsed_time = std::chrono::system_clock::now() - start_time;
+            if (integration_time < elapsed_time.count()*1000000) {
+                is_sleeping = false;
+            }
+            if (!((appManager_->Get_Is_Running()) && (is_streaming))) {
+                is_sleeping = false;
+            }
+            if (is_sleeping) { 
+                std::this_thread::sleep_for(std::chrono::milliseconds(10));
+            }
+        }
+        // Sleep(integration_time/1000.0);
 
         // pixels 16-bit little-endian
         int total_bytes = SPECTRUM_PIXELS * 2;
