@@ -232,6 +232,7 @@ void CameraControler::stop_Acquire() {
     data.is_streaming = false;
     if(thread_acquire != NULL){
         thread_acquire->join();
+        thread_acquire = NULL;
     }
 }
 

@@ -24,8 +24,13 @@ void CamView::setFrame(const QImage &img) {
            img.width() - left_offset - right_offset,
            img.height() - top_offset - bottom_offset);
     last_image = img.copy(zone);
+    QPixmap pix_map = QPixmap::fromImage(last_image);
 
-    QPixmap pix = QPixmap::fromImage(last_image).scaled(size(), Qt::KeepAspectRatio);
+    if(pix_map.isNull()) {
+        return;
+    }
+
+    QPixmap pix = pix_map.scaled(size(), Qt::KeepAspectRatio);
 
     int x_offset = (width()  - pix.width())  / 2;
     int y_offset = (height() - pix.height()) / 2;
