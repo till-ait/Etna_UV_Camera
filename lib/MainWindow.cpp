@@ -338,7 +338,7 @@ MainWindow::MainWindow(AppManager* appManager, QWidget *parent)
             checkBox_spectro_gain->setText("IntTime : " + QString::number(value) + "s");
         }
 
-        float time_between_save = value * appManager_->Get_Spectrometer()->Get_scans_to_average();
+        double time_between_save = value * appManager_->Get_Spectrometer()->Get_scans_to_average();
         
         label_periode_spectro->setText("Sampling time : " + QString::number(time_between_save) + "sec");
         Set_Time_between_save(time_between_save*1000);
@@ -359,10 +359,10 @@ MainWindow::MainWindow(AppManager* appManager, QWidget *parent)
             checkBox_spectro_averaging->setText("CoAdd : " + QString::fromStdString(std::to_string(appManager_->Get_Spectrometer()->Get_scans_to_average())));
         }
 
-        float time_between_save = value * appManager_->Get_Spectrometer()->Get_integration_time();
+        double time_between_save = value * (appManager_->Get_Spectrometer()->Get_integration_time()/1000000);
         
-        label_periode_spectro->setText("Sampling time : " + QString::number(time_between_save/1000000) + "s");
-        Set_Time_between_save(time_between_save/1000);
+        label_periode_spectro->setText("Sampling time : " + QString::number(time_between_save) + "s");
+        Set_Time_between_save(time_between_save*1000);
         time_last_save_spectrum = std::chrono::steady_clock::now();
     });
 
