@@ -102,9 +102,9 @@ private:
     QLabel *label_periode_spectro;
     QSpinBox *spin_periode_spectro;
     QCheckBox *checkBox_spectro_gain;
-    QSlider *slider_spectro_gain;
+    QSpinBox *slider_spectro_gain;
     QCheckBox *checkBox_spectro_averaging;
-    QSlider *slider_spectro_averaging;
+    QSpinBox *slider_spectro_averaging;
     QLabel *counter_spectrum_rec;
     QLineSeries *series_spectro;
     QChart *chart_spectro;

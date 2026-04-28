@@ -151,20 +151,18 @@ MainWindow::MainWindow(AppManager* appManager, QWidget *parent)
     spin_periode_spectro->setMaximum(1000);
     spin_periode_spectro->setSuffix(" s");
     checkBox_spectro_gain = new QCheckBox("IntTime : " + QString::fromStdString(std::to_string(appManager_->Get_Spectrometer()->Get_integration_time())));
-    slider_spectro_gain = new QSlider(Qt::Horizontal);
-    slider_spectro_gain->setMinimum(500);
-    slider_spectro_gain->setMaximum(1000);
+    slider_spectro_gain = new QSpinBox();
+    slider_spectro_gain->setMinimum(1);
+    slider_spectro_gain->setMaximum(60000000);
     slider_spectro_gain->setValue(500);
     slider_spectro_gain->setSingleStep(1);
-    slider_spectro_gain->setPageStep(1);
     slider_spectro_gain->setEnabled(false);
     checkBox_spectro_averaging = new QCheckBox("CoAdd : " + QString::fromStdString(std::to_string(appManager_->Get_Spectrometer()->Get_scans_to_average())));
-    slider_spectro_averaging = new QSlider(Qt::Horizontal);
+    slider_spectro_averaging = new QSpinBox();
     slider_spectro_averaging->setMinimum(1);
     slider_spectro_averaging->setMaximum(300);
     slider_spectro_averaging->setValue(1);
     slider_spectro_averaging->setSingleStep(1);
-    slider_spectro_averaging->setPageStep(1);
     slider_spectro_averaging->setEnabled(false);
     counter_spectrum_rec = new QLabel("Acquire counter : 0");
     series_spectro = new QLineSeries();
@@ -343,14 +341,21 @@ MainWindow::MainWindow(AppManager* appManager, QWidget *parent)
         }
     });
 
-    QObject::connect(slider_spectro_gain, &QSlider::sliderReleased, [&]() {
-        int value = slider_spectro_gain->value();
-        double integ_time = 0.0;
-        if (value > 0.0) integ_time = std::pow(10.0, (value / 1000.0) * 7.778151250383644); //7.778151250383644 = log10(60_000_000)
+    QObject::connect(slider_spectro_gain, &QSpinBox::valueChanged, [&](long value) {
         if(appManager_->Get_Spectrometer()->Is_Connected()){
-            appManager_->Get_Spectrometer()->Set_integration_time(integ_time);
+            appManager_->Get_Spectrometer()->Set_integration_time(value);
+            QString sec = QString::fromStdString(std::to_string(appManager_->Get_Spectrometer()->Get_integration_time()/1000000)) + "s ";
+            QString msec = QString::fromStdString(std::to_string((appManager_->Get_Spectrometer()->Get_integration_time()/1000)%1000)) + "ms ";
+            QString usec = QString::fromStdString(std::to_string(appManager_->Get_Spectrometer()->Get_integration_time()%1000)) + "us ";
+            checkBox_spectro_gain->setText("IntTime : " + sec + msec + usec);
         }
-        checkBox_spectro_gain->setText("IntTime : " + QString::fromStdString(std::to_string(appManager_->Get_Spectrometer()->Get_integration_time())));
+        
+        // QString sec = QString::fromStdString(std::to_string(appManager_->Get_Spectrometer()->Get_integration_time()/1000000)) + "s ";
+        // QString msec = QString::fromStdString(std::to_string((appManager_->Get_Spectrometer()->Get_integration_time()/1000)%1000)) + "ms ";
+        // QString usec = QString::fromStdString(std::to_string(appManager_->Get_Spectrometer()->Get_integration_time()%1000)) + "us ";
+        
+        // label_periode_spectro->setText("Time between save : " + sec + msec + usec);
+        // Set_Time_between_save(value * appManager_->Get_Spectrometer()->Get_scans_to_average());
     });
 
     QObject::connect(checkBox_spectro_averaging, &QCheckBox::toggled, [&](bool checked) {
@@ -360,12 +365,19 @@ MainWindow::MainWindow(AppManager* appManager, QWidget *parent)
             slider_spectro_averaging->setEnabled(false);
         }
     });
-    
-    QObject::connect(slider_spectro_averaging, &QSlider::valueChanged, [&](int value) {
+
+    QObject::connect(slider_spectro_averaging, &QSpinBox::valueChanged, [&](long value) {
         if(appManager_->Get_Spectrometer()->Is_Connected()){
             appManager_->Get_Spectrometer()->Set_scans_to_average(value);
+            checkBox_spectro_averaging->setText("CoAdd : " + QString::fromStdString(std::to_string(appManager_->Get_Spectrometer()->Get_scans_to_average())));
         }
-        checkBox_spectro_averaging->setText("CoAdd : " + QString::fromStdString(std::to_string(appManager_->Get_Spectrometer()->Get_scans_to_average())));
+
+        // QString sec = QString::fromStdString(std::to_string(appManager_->Get_Spectrometer()->Get_integration_time()/1000000)) + "s ";
+        // QString msec = QString::fromStdString(std::to_string((appManager_->Get_Spectrometer()->Get_integration_time()/1000)%1000)) + "ms ";
+        // QString usec = QString::fromStdString(std::to_string(appManager_->Get_Spectrometer()->Get_integration_time()%1000)) + "us ";
+        
+        // label_periode_spectro->setText("Time between save : " + sec + msec + usec);
+        // Set_Time_between_save(value * appManager_->Get_Spectrometer()->Get_integration_time());
     });
 
     QObject::connect(btn_acquire_spectro, &QPushButton::clicked, [&]() {
