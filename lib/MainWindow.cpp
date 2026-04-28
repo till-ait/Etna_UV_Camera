@@ -62,7 +62,7 @@ MainWindow::MainWindow(AppManager* appManager, QWidget *parent)
     btn_select_save_folder = new QPushButton("Select save folder");
     btn_save_images = new QPushButton("Start Rec");
     btn_pause_save_images = new QPushButton("Pause Rec");
-    label_periode_image = new QLabel("Acquire Timing :");
+    label_periode_image = new QLabel("Sampling time :");
     spin_periode_image = new QSpinBox();
     spin_periode_image->setValue(DEFAULT_PERIODE/1000);
     spin_periode_image->setMinimum(MIN_ACQUIRE_TIME/1000);
@@ -98,7 +98,7 @@ MainWindow::MainWindow(AppManager* appManager, QWidget *parent)
     slider_diff_gain->setSingleStep(1);
     slider_diff_gain->setPageStep(1);
     slider_diff_gain->setEnabled(false);
-    counter_image_rec = new QLabel("Acquire counter : 0");
+    counter_image_rec = new QLabel("Sample counter : 0");
 
     CamBtLayout->addWidget(btn_connect_cam330);
     CamBtLayout->addWidget(btn_connect_cam310);
@@ -144,7 +144,7 @@ MainWindow::MainWindow(AppManager* appManager, QWidget *parent)
     btn_disconnect_spectro = new QPushButton("Disconnect Spectro");
     btn_acquire_spectro = new QPushButton("Start Rec");
     btn_pause_save_spectro = new QPushButton("Pause Rec");
-    label_periode_spectro = new QLabel("Time between save :");
+    label_periode_spectro = new QLabel("Sampling time :");
     checkBox_spectro_gain = new QCheckBox("IntTime : " + QString::fromStdString(std::to_string(appManager_->Get_Spectrometer()->Get_integration_time())));
     slider_spectro_gain = new QSpinBox();
     slider_spectro_gain->setMinimum(1);
@@ -159,7 +159,7 @@ MainWindow::MainWindow(AppManager* appManager, QWidget *parent)
     slider_spectro_averaging->setValue(1);
     slider_spectro_averaging->setSingleStep(1);
     slider_spectro_averaging->setEnabled(false);
-    counter_spectrum_rec = new QLabel("Acquire counter : 0");
+    counter_spectrum_rec = new QLabel("Sample counter : 0");
     series_spectro = new QLineSeries();
     series_spectro->setPen(QPen(Qt::black, 1));
     chart_spectro = new QChart();
@@ -347,7 +347,7 @@ MainWindow::MainWindow(AppManager* appManager, QWidget *parent)
         QString msec = QString::fromStdString(std::to_string((time_between_save/1000)%1000)) + "ms ";
         QString usec = QString::fromStdString(std::to_string(time_between_save%1000)) + "us ";
         
-        label_periode_spectro->setText("Time between save : " + sec + msec + usec);
+        label_periode_spectro->setText("Sampling time : " + sec + msec + usec);
         Set_Time_between_save(time_between_save/1000);
         time_last_save_spectrum = std::chrono::steady_clock::now();
     });
@@ -372,7 +372,7 @@ MainWindow::MainWindow(AppManager* appManager, QWidget *parent)
         QString msec = QString::fromStdString(std::to_string((time_between_save/1000)%1000)) + "ms ";
         QString usec = QString::fromStdString(std::to_string(time_between_save%1000)) + "us ";
         
-        label_periode_spectro->setText("Time between save : " + sec + msec + usec);
+        label_periode_spectro->setText("Sampling time : " + sec + msec + usec);
         Set_Time_between_save(time_between_save/1000);
         time_last_save_spectrum = std::chrono::steady_clock::now();
     });
@@ -383,7 +383,7 @@ MainWindow::MainWindow(AppManager* appManager, QWidget *parent)
             pause_save_spectro = false;
             btn_acquire_spectro->setText("Start Rec");
             btn_pause_save_spectro->setText("Pause Rec");
-            counter_spectrum_rec->setText("Acquire counter : 0");
+            counter_spectrum_rec->setText("Sample counter : 0");
             spectrum_counter = 0;
             return;
         }
@@ -442,7 +442,7 @@ void MainWindow::onNewSpectrum(std::vector<double> spectrum, std::vector<double>
 
 void MainWindow::saving_spectrum(std::vector<double> spectrum, std::vector<double> wavelengths) {
     spectrum_counter++;
-    counter_spectrum_rec->setText("Acquire counter : " + QString::number(spectrum_counter));
+    counter_spectrum_rec->setText("Sample counter : " + QString::number(spectrum_counter));
 
     QString csv_name = "Spetrum_" + QDateTime::currentDateTime().toString("yyyyMMdd_hhmmss_zzz") + ".csv";
     csv_file = new CSV_file_manager(csv_name.toStdString(), save_folder.toStdString());
@@ -451,7 +451,7 @@ void MainWindow::saving_spectrum(std::vector<double> spectrum, std::vector<doubl
         std::vector<std::string> data;
         data.push_back("Model : Unknown");
         data.push_back("Date : " + QDateTime::currentDateTime().toString("yyyy/MM/dd_hh:mm:ss").toStdString());
-        data.push_back("Spectrum counter : " + std::to_string(spectrum_counter));
+        data.push_back("Sample counter : " + std::to_string(spectrum_counter));
         data.push_back("Spectrometer serial number : " + appManager_->Get_Spectrometer()->Get_serial_number());
         data.push_back("Integration Time : " + std::to_string(appManager_->Get_Spectrometer()->Get_integration_time()));
         data.push_back("Spectral coadding : " + std::to_string(appManager_->Get_Spectrometer()->Get_scans_to_average()));
@@ -497,7 +497,7 @@ void MainWindow::onNewFrame(QString sourceName, QImage image) {
             QString filenameCopy = filename;
             std::thread([imageCopy, filenameCopy]() {imageCopy.save(filenameCopy);}).detach();
 
-            counter_image_rec->setText("Acquire counter : " + QString::number(image_cam330_counter));
+            counter_image_rec->setText("Sample counter : " + QString::number(image_cam330_counter));
 
             time_last_save_cam330 = std::chrono::steady_clock::now();
         }
@@ -562,7 +562,7 @@ void MainWindow::Save_images_activation(){
         
         image_cam330_counter = 0;
         image_cam310_counter = 0;
-        counter_image_rec->setText("Acquire counter : 0");
+        counter_image_rec->setText("Sample counter : 0");
 
         img_cam330->Set_is_reccorded(true);
         img_cam310->Set_is_reccorded(true);
