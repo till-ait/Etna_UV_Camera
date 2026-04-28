@@ -144,12 +144,7 @@ MainWindow::MainWindow(AppManager* appManager, QWidget *parent)
     btn_disconnect_spectro = new QPushButton("Disconnect Spectro");
     btn_acquire_spectro = new QPushButton("Start Rec");
     btn_pause_save_spectro = new QPushButton("Pause Rec");
-    label_periode_spectro = new QLabel("Acquire Timing :");
-    spin_periode_spectro = new QSpinBox();
-    spin_periode_spectro->setValue(DEFAULT_PERIODE/1000);
-    spin_periode_spectro->setMinimum(MIN_ACQUIRE_TIME/1000);
-    spin_periode_spectro->setMaximum(1000);
-    spin_periode_spectro->setSuffix(" s");
+    label_periode_spectro = new QLabel("Time between save :");
     checkBox_spectro_gain = new QCheckBox("IntTime : " + QString::fromStdString(std::to_string(appManager_->Get_Spectrometer()->Get_integration_time())));
     slider_spectro_gain = new QSpinBox();
     slider_spectro_gain->setMinimum(1);
@@ -178,14 +173,13 @@ MainWindow::MainWindow(AppManager* appManager, QWidget *parent)
     chartView->setRenderHint(QPainter::Antialiasing);
     SpectrometerBtnLayout->addWidget(btn_connect_spectro);
     SpectrometerBtnLayout->addWidget(btn_disconnect_spectro);
-    SpectrometerBtnLayout->addWidget(label_periode_spectro);
-    SpectrometerBtnLayout->addWidget(spin_periode_spectro);
     SpectrometerBtnLayout->addWidget(btn_acquire_spectro);
     SpectrometerBtnLayout->addWidget(btn_pause_save_spectro);
     SpectrometerBtnLayout->addWidget(checkBox_spectro_gain);
     SpectrometerBtnLayout->addWidget(slider_spectro_gain);
     SpectrometerBtnLayout->addWidget(checkBox_spectro_averaging);
     SpectrometerBtnLayout->addWidget(slider_spectro_averaging);
+    SpectrometerBtnLayout->addWidget(label_periode_spectro);
     SpectrometerBtnLayout->addWidget(counter_spectrum_rec);
     SpectrometerBtnLayout->addStretch();
     SpectrometerLayout->addLayout(SpectrometerBtnLayout, 1);
@@ -278,6 +272,7 @@ MainWindow::MainWindow(AppManager* appManager, QWidget *parent)
             btn_pause_save_spectro->setText("Resume Rec");
         }
         else if(!save_spectrum && pause_save_spectro) {
+            time_last_save_spectrum = std::chrono::steady_clock::now();
             save_spectrum = true;
             pause_save_spectro = false;
             btn_pause_save_spectro->setText("Pause Rec");
@@ -286,10 +281,6 @@ MainWindow::MainWindow(AppManager* appManager, QWidget *parent)
 
     QObject::connect(spin_periode_image, &QSpinBox::valueChanged, [&](long value) {
         Set_Time_between_save(value * 1000);
-    });
-
-    QObject::connect(spin_periode_spectro, &QSpinBox::valueChanged, [&](long value) {
-        Set_Time_between_save_spectro(value * 1000);
     });
 
     QObject::connect(slider_exposure_time, &QSlider::valueChanged, [&](int value) {
@@ -349,13 +340,16 @@ MainWindow::MainWindow(AppManager* appManager, QWidget *parent)
             QString usec = QString::fromStdString(std::to_string(appManager_->Get_Spectrometer()->Get_integration_time()%1000)) + "us ";
             checkBox_spectro_gain->setText("IntTime : " + sec + msec + usec);
         }
+
+        int time_between_save = value * appManager_->Get_Spectrometer()->Get_scans_to_average();
         
-        // QString sec = QString::fromStdString(std::to_string(appManager_->Get_Spectrometer()->Get_integration_time()/1000000)) + "s ";
-        // QString msec = QString::fromStdString(std::to_string((appManager_->Get_Spectrometer()->Get_integration_time()/1000)%1000)) + "ms ";
-        // QString usec = QString::fromStdString(std::to_string(appManager_->Get_Spectrometer()->Get_integration_time()%1000)) + "us ";
+        QString sec = QString::fromStdString(std::to_string(time_between_save/1000000)) + "s ";
+        QString msec = QString::fromStdString(std::to_string((time_between_save/1000)%1000)) + "ms ";
+        QString usec = QString::fromStdString(std::to_string(time_between_save%1000)) + "us ";
         
-        // label_periode_spectro->setText("Time between save : " + sec + msec + usec);
-        // Set_Time_between_save(value * appManager_->Get_Spectrometer()->Get_scans_to_average());
+        label_periode_spectro->setText("Time between save : " + sec + msec + usec);
+        Set_Time_between_save(time_between_save/1000);
+        time_last_save_spectrum = std::chrono::steady_clock::now();
     });
 
     QObject::connect(checkBox_spectro_averaging, &QCheckBox::toggled, [&](bool checked) {
@@ -372,12 +366,15 @@ MainWindow::MainWindow(AppManager* appManager, QWidget *parent)
             checkBox_spectro_averaging->setText("CoAdd : " + QString::fromStdString(std::to_string(appManager_->Get_Spectrometer()->Get_scans_to_average())));
         }
 
-        // QString sec = QString::fromStdString(std::to_string(appManager_->Get_Spectrometer()->Get_integration_time()/1000000)) + "s ";
-        // QString msec = QString::fromStdString(std::to_string((appManager_->Get_Spectrometer()->Get_integration_time()/1000)%1000)) + "ms ";
-        // QString usec = QString::fromStdString(std::to_string(appManager_->Get_Spectrometer()->Get_integration_time()%1000)) + "us ";
+        int time_between_save = value * appManager_->Get_Spectrometer()->Get_integration_time();
+
+        QString sec = QString::fromStdString(std::to_string(time_between_save/1000000)) + "s ";
+        QString msec = QString::fromStdString(std::to_string((time_between_save/1000)%1000)) + "ms ";
+        QString usec = QString::fromStdString(std::to_string(time_between_save%1000)) + "us ";
         
-        // label_periode_spectro->setText("Time between save : " + sec + msec + usec);
-        // Set_Time_between_save(value * appManager_->Get_Spectrometer()->Get_integration_time());
+        label_periode_spectro->setText("Time between save : " + sec + msec + usec);
+        Set_Time_between_save(time_between_save/1000);
+        time_last_save_spectrum = std::chrono::steady_clock::now();
     });
 
     QObject::connect(btn_acquire_spectro, &QPushButton::clicked, [&]() {
@@ -401,6 +398,7 @@ MainWindow::MainWindow(AppManager* appManager, QWidget *parent)
             }
         }
 
+        time_last_save_spectrum = std::chrono::steady_clock::now();
         save_spectrum = true;
         pause_save_spectro = false;
         btn_acquire_spectro->setText("Stop Rec");
