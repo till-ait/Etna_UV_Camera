@@ -101,7 +101,7 @@ private:
     QPushButton *btn_pause_save_spectro;
     QLabel *label_periode_spectro;
     QCheckBox *checkBox_spectro_gain;
-    QSpinBox *slider_spectro_gain;
+    QDoubleSpinBox *slider_spectro_gain;
     QCheckBox *checkBox_spectro_averaging;
     QSpinBox *slider_spectro_averaging;
     QLabel *counter_spectrum_rec;

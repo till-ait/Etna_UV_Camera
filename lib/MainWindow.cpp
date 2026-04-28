@@ -146,17 +146,17 @@ MainWindow::MainWindow(AppManager* appManager, QWidget *parent)
     btn_pause_save_spectro = new QPushButton("Pause Rec");
     label_periode_spectro = new QLabel("Sampling time :");
     checkBox_spectro_gain = new QCheckBox("IntTime : " + QString::fromStdString(std::to_string(appManager_->Get_Spectrometer()->Get_integration_time())));
-    slider_spectro_gain = new QSpinBox();
+    slider_spectro_gain = new QDoubleSpinBox();
     slider_spectro_gain->setMinimum(0.0001);
-    slider_spectro_gain->setMaximum(60);
-    slider_spectro_gain->setValue(500);
+    slider_spectro_gain->setMaximum(60.0);
+    slider_spectro_gain->setValue(0.1);
     slider_spectro_gain->setSingleStep(1);
     slider_spectro_gain->setEnabled(false);
     checkBox_spectro_averaging = new QCheckBox("CoAdd : " + QString::fromStdString(std::to_string(appManager_->Get_Spectrometer()->Get_scans_to_average())));
     slider_spectro_averaging = new QSpinBox();
     slider_spectro_averaging->setMinimum(1);
     slider_spectro_averaging->setMaximum(300);
-    slider_spectro_averaging->setValue(1);
+    slider_spectro_averaging->setValue(5);
     slider_spectro_averaging->setSingleStep(1);
     slider_spectro_averaging->setEnabled(false);
     counter_spectrum_rec = new QLabel("Sample counter : 0");
@@ -332,7 +332,7 @@ MainWindow::MainWindow(AppManager* appManager, QWidget *parent)
         }
     });
 
-    QObject::connect(slider_spectro_gain, &QSpinBox::valueChanged, [&](long value) {
+    QObject::connect(slider_spectro_gain, &QDoubleSpinBox::valueChanged, [&](double value) {
         if(appManager_->Get_Spectrometer()->Is_Connected()){
             appManager_->Get_Spectrometer()->Set_integration_time(value * 1000000);
             checkBox_spectro_gain->setText("IntTime : " + QString::number(value) + "s");
