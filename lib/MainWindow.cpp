@@ -145,11 +145,11 @@ MainWindow::MainWindow(AppManager* appManager, QWidget *parent)
     btn_acquire_spectro = new QPushButton("Start Rec");
     btn_pause_save_spectro = new QPushButton("Pause Rec");
     label_periode_spectro = new QLabel("Sampling time :");
-    checkBox_spectro_gain = new QCheckBox("IntTime : " + QString::fromStdString(std::to_string(appManager_->Get_Spectrometer()->Get_integration_time())));
+    checkBox_spectro_gain = new QCheckBox("IntTime : " + QString::fromStdString(std::to_string(appManager_->Get_Spectrometer()->Get_integration_time()/1000000.0)));
     slider_spectro_gain = new QDoubleSpinBox();
-    slider_spectro_gain->setMinimum(0.0001);
+    slider_spectro_gain->setMinimum(0.00001);
     slider_spectro_gain->setMaximum(60.0);
-    slider_spectro_gain->setValue(0.1);
+    slider_spectro_gain->setValue(appManager_->Get_Spectrometer()->Get_integration_time()/1000000.0);
     slider_spectro_gain->setSingleStep(1);
     slider_spectro_gain->setEnabled(false);
     checkBox_spectro_averaging = new QCheckBox("CoAdd : " + QString::fromStdString(std::to_string(appManager_->Get_Spectrometer()->Get_scans_to_average())));
@@ -450,7 +450,7 @@ void MainWindow::saving_spectrum(std::vector<double> spectrum, std::vector<doubl
         data.push_back("Calibration coef 3 : " + std::to_string(appManager_->Get_Spectrometer()->Get_calibration_coef(2)));
         data.push_back("Calibration coef 4 : " + std::to_string(appManager_->Get_Spectrometer()->Get_calibration_coef(3)));
         // data.push_back("Temperature : Unknown");
-        data.push_back("+++++++++++++++++++++++++");
+        // data.push_back("+++++++++++++++++++++++++");
         int header_lentgth = data.size();
 
         for(double value : wavelengths) {
