@@ -156,7 +156,7 @@ MainWindow::MainWindow(AppManager* appManager, QWidget *parent)
     slider_spectro_averaging = new QSpinBox();
     slider_spectro_averaging->setMinimum(1);
     slider_spectro_averaging->setMaximum(300);
-    slider_spectro_averaging->setValue(5);
+    slider_spectro_averaging->setValue(1);
     slider_spectro_averaging->setSingleStep(1);
     slider_spectro_averaging->setEnabled(false);
     counter_spectrum_rec = new QLabel("Sample counter : 0");
@@ -427,7 +427,43 @@ void MainWindow::onNewSpectrum(std::vector<double> spectrum, std::vector<double>
     if (save_spectrum && (elapsed >= time_between_save_ms_spectro)) {
         saving_spectrum(spectrum, wavelengths);
     }
+
+    // old_averaging(spectrum, wavelengths);
 }
+
+// void MainWindow::old_averaging(std::vector<double> spectrum, std::vector<double> wavelengths) {
+//     static std::vector<double> spectrum_sum;
+//     static int nb_spectrum_summed = 0;
+//     if(spectrum_sum.size() == 0) {
+//         for(double value : spectrum){
+//             spectrum_sum.push_back(value);
+//         }
+//         nb_spectrum_summed++;
+//         return;
+//     }
+
+//     if(nb_spectrum_summed >= appManager_->Get_Spectrometer()->Get_scans_to_average()) {
+//         std::cout << "BBBB" << std::endl;
+//         int denominator = appManager_->Get_Spectrometer()->Get_scans_to_average();
+//         for(int i=0;i<spectrum_sum.size();i++){
+//             spectrum_sum[i] = spectrum_sum[i]/denominator;
+//         }
+//         if (save_spectrum) {
+//             std::cout << "CCCC" << std::endl;
+//             saving_spectrum(spectrum_sum, wavelengths);
+//         }
+//         nb_spectrum_summed = 0;
+//         for(int i=0;i<spectrum_sum.size();i++){
+//             spectrum_sum[i] = 0.0;
+//         }
+//         return;
+//     }
+
+//     for(int i=0;i<spectrum_sum.size();i++){
+//         spectrum_sum[i] = spectrum_sum[i] + spectrum[i];
+//     }
+//     nb_spectrum_summed++;
+// }
 
 void MainWindow::saving_spectrum(std::vector<double> spectrum, std::vector<double> wavelengths) {
     spectrum_counter++;

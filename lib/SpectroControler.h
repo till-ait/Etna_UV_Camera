@@ -42,7 +42,7 @@
 #define DEFAULT_INTEGRATION_TIME 500000  // micro sec
 #define MAX_INTEGRATION_TIME 60000000
 #define MIN_INTEGRATION_TIME 1
-#define DEFAULT_AVERAGING 5
+#define DEFAULT_AVERAGING 1
 #define DEFAULT_TRIGGER_MODE 0
 #define SPECTRUM_LENGTH 3840
 #define DEFAULT_AVERAGING_ALPHA 0.1
@@ -106,6 +106,7 @@ private :
 
     std::thread* thread_acquire;
     std::string serial_number;
+    bool first_spectrum;
 };
 
 #endif

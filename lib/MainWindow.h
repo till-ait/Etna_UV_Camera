@@ -125,6 +125,7 @@ private:
     void align_crosses();
     void update_gain();
     void saving_spectrum(std::vector<double> spectrum, std::vector<double> wavelengths);
+    // void old_averaging(std::vector<double> spectrum, std::vector<double> wavelengths);
 
     int image_cam330_counter;
     int image_cam310_counter;

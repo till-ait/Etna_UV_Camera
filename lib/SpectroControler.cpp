@@ -23,6 +23,7 @@ SpectroControler::SpectroControler(AppManager *_appManager_) {
     serial_number = "Unknown";
     deviceHandle = INVALID_HANDLE_VALUE;
     usbHandleInitialized = false;
+    first_spectrum = true;
 }
 
 SpectroControler::~SpectroControler() {
@@ -181,6 +182,9 @@ bool SpectroControler::Set_integration_time(uint32_t micros) {
     cmd[2] = (integration_time >>  8) & 0xFF;
     cmd[3] = (integration_time >> 16) & 0xFF;
     cmd[4] = (integration_time >> 24) & 0xFF;
+
+    first_spectrum = true;
+
     return WinUsb_WritePipe(usbHandle, EP_OUT, cmd, 5, &transferred, NULL);
 }
 
@@ -189,6 +193,7 @@ bool SpectroControler::Set_scans_to_average(uint16_t scans)
     scans_average = scans;
 
     alpha_coef = smoothingToAlpha(scans);
+    first_spectrum = true;
 
     return true;
 }
@@ -255,9 +260,19 @@ void SpectroControler::Get_spectrum() {
 
         std::vector<double> spectrum(received/2);
         std::vector<double> wavelengths, intensities;
-        for (int i = 0; i < received/2; ++i) {
-            uint16_t val = (uint16_t)(raw[2*i] | (raw[2*i+1] << 8));
-            average_spectrum[i] = (1-alpha_coef)*average_spectrum[i] + (alpha_coef)*val;
+        
+        if(first_spectrum) {
+            for (int i = 0; i < received/2; ++i) {
+                uint16_t val = (uint16_t)(raw[2*i] | (raw[2*i+1] << 8));
+                average_spectrum[i] = val;
+            }
+            first_spectrum = false;
+        }
+        else {
+            for (int i = 0; i < received/2; ++i) {
+                uint16_t val = (uint16_t)(raw[2*i] | (raw[2*i+1] << 8));
+                average_spectrum[i] = (1-alpha_coef)*average_spectrum[i] + (alpha_coef)*val;
+            }
         }
 
         ProcessSpectrum(average_spectrum, wavelengths, intensities);
