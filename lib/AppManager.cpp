@@ -7,7 +7,7 @@
 #include "SpectroControler.h"
 
 AppManager::AppManager() {
-    std::cout << "App Manager created." << std::endl;
+    // std::cout << "App Manager created." << std::endl;
     is_running = true;
     Cameras = new std::vector<CameraControler*>();
     inputHandler_ = new InputHandler(this);
@@ -16,17 +16,17 @@ AppManager::AppManager() {
 }
 
 AppManager::AppManager(char** argv) {
-    std::cout << "App Manager created." << std::endl;
+    // std::cout << "App Manager created." << std::endl;
     is_running = true;
     Cameras = new std::vector<CameraControler*>();
     inputHandler_ = new InputHandler(this);
 
     if(std::string(argv[1]) == "cmd") {
-        std::cout << "CMD selected" << std::endl;
+        // std::cout << "CMD selected" << std::endl;
         userInterface_ = new CmdUi(this);
     }
     else {
-        std::cout << "QT selected" << std::endl;
+        // std::cout << "QT selected" << std::endl;
         userInterface_ = new QtUi(this);
     }
 
@@ -44,11 +44,11 @@ AppManager::~AppManager() {
     delete Cameras;
     delete spectrometer;
     
-    std::cout << "App Manager have been deleted." << std::endl;
+    // std::cout << "App Manager have been deleted." << std::endl;
 }
 
 bool AppManager::Start_App() {
-    std::cout << "App Start ... " << std::endl;
+    // std::cout << "App Start ... " << std::endl;
 
     std::thread UI_Input_Thread([this]() { userInterface_->Update_Input(); });
     std::thread InputHandler_Thread([this]() { inputHandler_->Update(); });

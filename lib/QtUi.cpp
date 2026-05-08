@@ -20,7 +20,7 @@ void QtUi::Update_Input() {
     
     // Not used
 
-    std::cout << "Input Thread closing ..." << std::endl;
+    // std::cout << "Input Thread closing ..." << std::endl;
 }
 
 void QtUi::Push_Frame(std::string* source_Name, uint8_t *data, uint32_t width, uint32_t height) {

@@ -1,4 +1,4 @@
-add_executable(Etna_UV_Camera main.cpp)
+add_executable(Etna_UV_Camera WIN32 main.cpp)
 
 target_include_directories(Etna_UV_Camera PRIVATE ${EBUS_INCLUDE_DIR})
 
