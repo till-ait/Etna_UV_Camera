@@ -78,6 +78,9 @@ void CamView::paintEvent(QPaintEvent *event) {
 
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing);
+    QFont font = painter.font();
+    font.setPointSize(20);
+    painter.setFont(font);
 
     int x = crossPos.x();
     int y = crossPos.y();
@@ -91,7 +94,7 @@ void CamView::paintEvent(QPaintEvent *event) {
     painter.drawLine(x, y + gapSize,   x, y + crossSize);
 
     if(is_recorded) {
-        painter.drawText(width()/2 - 11, 12, "Rec ●");
+        painter.drawText(width()/2 - 11, 20, "Rec ●");
     }
 }
 
