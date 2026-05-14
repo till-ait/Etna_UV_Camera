@@ -5,6 +5,7 @@
 #include <QDateTime>
 #include <QMouseEvent>
 #include <QPainter>
+#include <QValueAxis>
 #include <thread>
 #include <cmath>
 #include <algorithm>
@@ -37,6 +38,8 @@ MainWindow::MainWindow(AppManager* appManager, QWidget *parent)
     csv_file = NULL;
 
     //// LAYOUT ////
+
+    setStyleSheet("background-color: #FFF9C4;");
 
     mainLayout = new QVBoxLayout();
 
@@ -169,6 +172,8 @@ MainWindow::MainWindow(AppManager* appManager, QWidget *parent)
     chart_spectro->legend()->hide();
     chart_spectro->setMargins(QMargins(0, 0, 0, 0));
     chart_spectro->setBackgroundRoundness(0);
+    auto axisY = qobject_cast<QValueAxis*>(chart_spectro->axes(Qt::Vertical).first());
+    axisY->setLabelFormat("%.0f");
     chartView = new QChartView(chart_spectro);
     chartView->setRenderHint(QPainter::Antialiasing);
     SpectrometerBtnLayout->addWidget(btn_connect_spectro);
@@ -359,7 +364,7 @@ MainWindow::MainWindow(AppManager* appManager, QWidget *parent)
             checkBox_spectro_averaging->setText("CoAdd : " + QString::fromStdString(std::to_string(appManager_->Get_Spectrometer()->Get_scans_to_average())));
         }
 
-        double time_between_save = value * (appManager_->Get_Spectrometer()->Get_integration_time()/1000000);
+        double time_between_save = value * (appManager_->Get_Spectrometer()->Get_integration_time()/1000000.0);
         
         label_periode_spectro->setText("Sampling time : " + QString::number(time_between_save) + "s");
         Set_Time_between_save(time_between_save*1000);
@@ -410,7 +415,7 @@ void MainWindow::onNewSpectrum(std::vector<double> spectrum, std::vector<double>
 
     chart_spectro->axes(Qt::Horizontal).first()->setRange(wavelengths[0], wavelengths[spectrum.size()-1]);
 
-    auto axisY = chart_spectro->axes(Qt::Vertical).first();
+    auto axisY = qobject_cast<QValueAxis*>(chart_spectro->axes(Qt::Vertical).first());
 
     double minY = *std::min_element(spectrum.begin(), spectrum.end());
 
@@ -420,6 +425,8 @@ void MainWindow::onNewSpectrum(std::vector<double> spectrum, std::vector<double>
     }
     
     axisY->setRange(minY, maxY);
+
+    axisY->setLabelFormat("%.0f");
 
     std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
     double elapsed = std::chrono::duration<double, std::milli>(now - time_last_save_spectrum).count();
