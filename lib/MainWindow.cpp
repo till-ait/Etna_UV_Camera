@@ -71,8 +71,8 @@ MainWindow::MainWindow(AppManager* appManager, QWidget *parent)
     btn_recenter_cross = new QPushButton("Recenter crosses");
     btn_align_crosses = new QPushButton("Align crosses");
     btn_reset_images = new QPushButton("Cancel alignment");
-    label_exposure_time = new QLabel("Time Exposure :");
-    checkBoxExposure = new QCheckBox("Time Exposure :");
+    label_exposure_time = new QLabel("Exposure :");
+    checkBoxExposure = new QCheckBox("Exposure :");
     slider_exposure_time = new QSlider(Qt::Horizontal);
     slider_exposure_time->setMinimum(MIN_EXPOSURE_TIME);
     slider_exposure_time->setMaximum(MAX_EXPOSURE_TIME/2);
@@ -481,10 +481,10 @@ void MainWindow::saving_spectrum(std::vector<double> spectrum, std::vector<doubl
         data.push_back("Integration Time : " + std::to_string(appManager_->Get_Spectrometer()->Get_integration_time()));
         data.push_back("Spectral coadding : " + std::to_string(appManager_->Get_Spectrometer()->Get_scans_to_average()));
         data.push_back("bandwidth (nm) : " + std::to_string(wavelengths[0])+ " - " + std::to_string(wavelengths[wavelengths.size()-1]));
-        data.push_back("Calibration coef 1 : " + std::to_string(appManager_->Get_Spectrometer()->Get_calibration_coef(0)));
-        data.push_back("Calibration coef 2 : " + std::to_string(appManager_->Get_Spectrometer()->Get_calibration_coef(1)));
-        data.push_back("Calibration coef 3 : " + std::to_string(appManager_->Get_Spectrometer()->Get_calibration_coef(2)));
-        data.push_back("Calibration coef 4 : " + std::to_string(appManager_->Get_Spectrometer()->Get_calibration_coef(3)));
+        data.push_back("Calibration coef 1:" + std::to_string(appManager_->Get_Spectrometer()->Get_calibration_coef(0)));
+        data.push_back("Calibration coef 2:" + std::to_string(appManager_->Get_Spectrometer()->Get_calibration_coef(1)));
+        data.push_back("Calibration coef 3:" + std::to_string(appManager_->Get_Spectrometer()->Get_calibration_coef(2)));
+        data.push_back("Calibration coef 4:" + std::to_string(appManager_->Get_Spectrometer()->Get_calibration_coef(3)));
         // data.push_back("Temperature : Unknown");
         // data.push_back("+++++++++++++++++++++++++");
         int header_lentgth = data.size();
