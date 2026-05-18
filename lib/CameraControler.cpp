@@ -28,7 +28,7 @@ CameraControler::CameraControler(AppManager* _appManager_, std::string name, std
     data.is_recording = false;
     data.fps = DEFAULT_FPS;
     data.exposure_time = DEFAULT_EXPOSURE_TIME;
-    data.gain = 3.0;
+    data.gain = 1.0;
 
     pv_result = new PvResult();
     buffer_list = new std::list<PvBuffer *>();

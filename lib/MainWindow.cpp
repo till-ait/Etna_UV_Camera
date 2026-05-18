@@ -88,7 +88,7 @@ MainWindow::MainWindow(AppManager* appManager, QWidget *parent)
     slider_gain = new QSlider(Qt::Horizontal);
     slider_gain->setMinimum(0);
     slider_gain->setMaximum(100);
-    slider_gain->setValue(50);
+    slider_gain->setValue(10);
     slider_gain->setSingleStep(1);
     slider_gain->setPageStep(1);
     slider_gain->setEnabled(false);
@@ -301,7 +301,7 @@ MainWindow::MainWindow(AppManager* appManager, QWidget *parent)
     });
 
     QObject::connect(slider_diff_gain, &QSlider::valueChanged, [&](int value) {
-        diff_gain = ((value-50)/10.0);
+        diff_gain = ((value-50)/20.0);
         update_gain();
     });
 
