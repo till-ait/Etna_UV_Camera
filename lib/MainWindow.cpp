@@ -103,8 +103,8 @@ MainWindow::MainWindow(AppManager* appManager, QWidget *parent)
     slider_diff_gain->setEnabled(false);
     counter_image_rec = new QLabel("Sample counter : 0");
 
-    CamBtLayout->addWidget(btn_connect_cam330);
     CamBtLayout->addWidget(btn_connect_cam310);
+    CamBtLayout->addWidget(btn_connect_cam330);
     CamBtLayout->addWidget(btn_recenter_cross);
     CamBtLayout->addWidget(btn_align_crosses);
     CamBtLayout->addWidget(btn_reset_images);
@@ -130,12 +130,12 @@ MainWindow::MainWindow(AppManager* appManager, QWidget *parent)
     img_cam310->setAlignment(Qt::AlignCenter);
     img_cam330->setMinimumSize(VIDEO_WIDTH, VIDEO_HEIGH);
     img_cam310->setMinimumSize(VIDEO_WIDTH, VIDEO_HEIGH);
-    layout_cam330->addWidget(img_cam330);
-    group_cam330->setLayout(layout_cam330);
-    CamVideoLayout->addWidget(group_cam330);
     layout_cam310->addWidget(img_cam310);
     group_cam310->setLayout(layout_cam310);
     CamVideoLayout->addWidget(group_cam310);
+    layout_cam330->addWidget(img_cam330);
+    group_cam330->setLayout(layout_cam330);
+    CamVideoLayout->addWidget(group_cam330);
     CamLayout->addLayout(CamVideoLayout, VIDEOLAYOUT_STRENGTH);
     
     SpectrometerLayout->setContentsMargins(0, 0, 0, 0);
