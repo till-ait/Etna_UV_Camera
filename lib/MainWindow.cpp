@@ -83,8 +83,8 @@ MainWindow::MainWindow(AppManager* appManager, QWidget *parent)
     slider_exposure_time->setSingleStep(25);
     slider_exposure_time->setPageStep(25);
     slider_exposure_time->setEnabled(false);
-    label_gain = new QLabel("Master Gain :");
-    checkBoxMasterGain = new QCheckBox("Master Gain :");
+    label_gain = new QLabel("Gain :");
+    checkBoxMasterGain = new QCheckBox("Gain :");
     slider_gain = new QSlider(Qt::Horizontal);
     slider_gain->setMinimum(0);
     slider_gain->setMaximum(100);
