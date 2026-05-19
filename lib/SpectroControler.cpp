@@ -24,6 +24,7 @@ SpectroControler::SpectroControler(AppManager *_appManager_) {
     deviceHandle = INVALID_HANDLE_VALUE;
     usbHandleInitialized = false;
     first_spectrum = true;
+    nb_coadded_spectrum = 0;
 }
 
 SpectroControler::~SpectroControler() {
@@ -260,25 +261,27 @@ void SpectroControler::Get_spectrum() {
 
         std::vector<double> spectrum(received/2);
         std::vector<double> wavelengths, intensities;
-        
+
         if(first_spectrum) {
-            for (int i = 0; i < received/2; ++i) {
-                uint16_t val = (uint16_t)(raw[2*i] | (raw[2*i+1] << 8));
-                average_spectrum[i] = val;
+            for(int i=0;i<average_spectrum.size();i++) {
+                average_spectrum[i] = 0;
             }
+            nb_coadded_spectrum = 0;
             first_spectrum = false;
         }
-        else {
-            for (int i = 0; i < received/2; ++i) {
-                uint16_t val = (uint16_t)(raw[2*i] | (raw[2*i+1] << 8));
-                average_spectrum[i] = (1-alpha_coef)*average_spectrum[i] + (alpha_coef)*val;
-            }
+        
+        for (int i = 0; i < received/2; ++i) {
+            uint16_t val = (uint16_t)(raw[2*i] | (raw[2*i+1] << 8));
+            average_spectrum[i] = average_spectrum[i] + val / scans_average;
         }
+
+        nb_coadded_spectrum++;
 
         ProcessSpectrum(average_spectrum, wavelengths, intensities);
         
-        if((appManager_->Get_Is_Running()) && (is_streaming)){
+        if((appManager_->Get_Is_Running()) && (is_streaming) && (nb_coadded_spectrum>=scans_average)){
             appManager_->Get_UserInterface()->Push_Spectrum(intensities,wavelengths);
+            first_spectrum = true;
         }
     }
 }

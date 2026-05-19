@@ -107,6 +107,7 @@ private :
     std::thread* thread_acquire;
     std::string serial_number;
     bool first_spectrum;
+    int nb_coadded_spectrum;
 };
 
 #endif
