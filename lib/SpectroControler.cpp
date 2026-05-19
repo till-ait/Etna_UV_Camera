@@ -199,6 +199,10 @@ bool SpectroControler::Set_scans_to_average(uint16_t scans)
     return true;
 }
 
+void SpectroControler::Rest_average_Spectrum() {
+    first_spectrum = true;
+}
+
 bool SpectroControler::Set_trigger_mode(uint8_t mode) {
     uint8_t cmd[2];
     cmd[0] = CMD_TRIGGER_MODE;

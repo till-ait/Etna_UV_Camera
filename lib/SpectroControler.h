@@ -39,7 +39,7 @@
 #define CMD_BUF_LENGTH 64
 #define DATA_BUF_LENGTH 512
 
-#define DEFAULT_INTEGRATION_TIME 500000  // micro sec
+#define DEFAULT_INTEGRATION_TIME 1000000  // micro sec
 #define MAX_INTEGRATION_TIME 60000000
 #define MIN_INTEGRATION_TIME 1
 #define DEFAULT_AVERAGING 1
@@ -61,6 +61,7 @@ public :
     int Get_integration_time();
     bool Set_scans_to_average(uint16_t scans);
     int Get_scans_to_average();
+    void Rest_average_Spectrum();
     std::string Get_serial_number();
     bool Set_trigger_mode(uint8_t mode);
     void Get_spectrum();

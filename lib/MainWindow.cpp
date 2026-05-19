@@ -23,10 +23,10 @@ MainWindow::MainWindow(AppManager* appManager, QWidget *parent)
     pause_save_spectro = false;
     save_spectrum = false;
     time_between_save_ms = DEFAULT_PERIODE;
-    time_between_save_ms_spectro = DEFAULT_PERIODE;
+    time_between_save_ms_spectro = 1000;
     time_last_save_cam330 = std::chrono::steady_clock::now();
     time_last_save_cam310 = std::chrono::steady_clock::now();
-    time_last_save_spectrum = std::chrono::steady_clock::now();
+    time_last_printed_spectrum = std::chrono::steady_clock::now();
     save_folder = "";
     image_cam330_counter = 0;
     image_cam310_counter = 0;
@@ -162,6 +162,9 @@ MainWindow::MainWindow(AppManager* appManager, QWidget *parent)
     slider_spectro_averaging->setValue(1);
     slider_spectro_averaging->setSingleStep(1);
     slider_spectro_averaging->setEnabled(false);
+    label_next_spectrum = new QLabel("Next spectrum in : --");
+    timer_countdown = new QTimer(this);
+    timer_countdown->setInterval(100); // refresh toutes les 100ms
     counter_spectrum_rec = new QLabel("Sample counter : 0");
     series_spectro = new QLineSeries();
     series_spectro->setPen(QPen(Qt::black, 1));
@@ -185,6 +188,7 @@ MainWindow::MainWindow(AppManager* appManager, QWidget *parent)
     SpectrometerBtnLayout->addWidget(checkBox_spectro_averaging);
     SpectrometerBtnLayout->addWidget(slider_spectro_averaging);
     SpectrometerBtnLayout->addWidget(label_periode_spectro);
+    SpectrometerBtnLayout->addWidget(label_next_spectrum);
     SpectrometerBtnLayout->addWidget(counter_spectrum_rec);
     SpectrometerBtnLayout->addStretch();
     SpectrometerLayout->addLayout(SpectrometerBtnLayout, 1);
@@ -277,7 +281,8 @@ MainWindow::MainWindow(AppManager* appManager, QWidget *parent)
             btn_pause_save_spectro->setText("Resume Rec");
         }
         else if(!save_spectrum && pause_save_spectro) {
-            time_last_save_spectrum = std::chrono::steady_clock::now();
+            appManager_->Get_Spectrometer()->Rest_average_Spectrum();
+            time_last_printed_spectrum = std::chrono::steady_clock::now();
             save_spectrum = true;
             pause_save_spectro = false;
             btn_pause_save_spectro->setText("Pause Rec");
@@ -346,8 +351,9 @@ MainWindow::MainWindow(AppManager* appManager, QWidget *parent)
         double time_between_save = value * appManager_->Get_Spectrometer()->Get_scans_to_average();
         
         label_periode_spectro->setText("Sampling time : " + QString::number(time_between_save) + "sec");
-        Set_Time_between_save(time_between_save*1000);
-        time_last_save_spectrum = std::chrono::steady_clock::now();
+        Set_Time_between_save_spectro(time_between_save*1000);
+        appManager_->Get_Spectrometer()->Rest_average_Spectrum();
+        time_last_printed_spectrum = std::chrono::steady_clock::now();
     });
 
     QObject::connect(checkBox_spectro_averaging, &QCheckBox::toggled, [&](bool checked) {
@@ -367,8 +373,9 @@ MainWindow::MainWindow(AppManager* appManager, QWidget *parent)
         double time_between_save = value * (appManager_->Get_Spectrometer()->Get_integration_time()/1000000.0);
         
         label_periode_spectro->setText("Sampling time : " + QString::number(time_between_save) + "s");
-        Set_Time_between_save(time_between_save*1000);
-        time_last_save_spectrum = std::chrono::steady_clock::now();
+        Set_Time_between_save_spectro(time_between_save*1000);
+        appManager_->Get_Spectrometer()->Rest_average_Spectrum();
+        time_last_printed_spectrum = std::chrono::steady_clock::now();
     });
 
     QObject::connect(btn_acquire_spectro, &QPushButton::clicked, [&]() {
@@ -392,11 +399,21 @@ MainWindow::MainWindow(AppManager* appManager, QWidget *parent)
             }
         }
 
-        time_last_save_spectrum = std::chrono::steady_clock::now();
+        appManager_->Get_Spectrometer()->Rest_average_Spectrum();
+        time_last_printed_spectrum = std::chrono::steady_clock::now();
         save_spectrum = true;
         pause_save_spectro = false;
         btn_acquire_spectro->setText("Stop Rec");
     });
+
+    QObject::connect(timer_countdown, &QTimer::timeout, [&]() {
+        std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
+        double elapsed = std::chrono::duration<double, std::milli>(now - time_last_printed_spectrum).count();
+        double remaining = time_between_save_ms_spectro - elapsed;
+        if (remaining < 0) remaining = 0;
+        label_next_spectrum->setText("Next spectrum in : " + QString::number(remaining / 1000.0, 'f', 1) + " s");
+    });
+    timer_countdown->start();
 }
 
 void MainWindow::onNewSpectrum(std::vector<double> spectrum, std::vector<double> wavelengths) {
@@ -428,12 +445,11 @@ void MainWindow::onNewSpectrum(std::vector<double> spectrum, std::vector<double>
 
     axisY->setLabelFormat("%.0f");
 
-    std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
-    double elapsed = std::chrono::duration<double, std::milli>(now - time_last_save_spectrum).count();
-
-    if (save_spectrum && (elapsed >= time_between_save_ms_spectro)) {
+    if (save_spectrum) {
         saving_spectrum(spectrum, wavelengths);
     }
+
+    time_last_printed_spectrum = std::chrono::steady_clock::now();
 
     // old_averaging(spectrum, wavelengths);
 }
@@ -507,7 +523,8 @@ void MainWindow::saving_spectrum(std::vector<double> spectrum, std::vector<doubl
         data.push_back(std::to_string(value));
     }
     csv_file->push_colum_without_saving(data);
-    time_last_save_spectrum = std::chrono::steady_clock::now();
+    appManager_->Get_Spectrometer()->Rest_average_Spectrum();
+    time_last_printed_spectrum = std::chrono::steady_clock::now();
     csv_file->save();
 }
 
@@ -564,7 +581,7 @@ void MainWindow::Set_Time_between_save(long value) {
 }
 
 void MainWindow::Set_Time_between_save_spectro(long value) {
-    if(value > 1) {
+    if(value > 0) {
         time_between_save_ms_spectro = value;
     }
 }

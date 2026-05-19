@@ -14,6 +14,7 @@
 #include <QtCharts/QChartView>
 #include <QtCharts/QLineSeries>
 #include <QCheckBox>
+#include <QTimer>
 #include <string>
 
 #define DEFAULT_PERIODE 10000
@@ -57,7 +58,7 @@ private:
     int spectrum_counter;
     std::chrono::steady_clock::time_point time_last_save_cam330;
     std::chrono::steady_clock::time_point time_last_save_cam310;
-    std::chrono::steady_clock::time_point time_last_save_spectrum;
+    std::chrono::steady_clock::time_point time_last_printed_spectrum;
     QString save_folder;
     CSV_file_manager *csv_file;
 
@@ -108,6 +109,8 @@ private:
     QLineSeries *series_spectro;
     QChart *chart_spectro;
     QChartView *chartView;
+    QTimer* timer_countdown;
+    QLabel* label_next_spectrum;
 
     QVBoxLayout *layout_cam330;
     QVBoxLayout *layout_cam310;
