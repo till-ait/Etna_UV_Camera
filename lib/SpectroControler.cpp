@@ -274,9 +274,10 @@ void SpectroControler::Get_spectrum() {
             first_spectrum = false;
         }
         
+        float denominator = 1.0 / scans_average;
         for (int i = 0; i < received/2; ++i) {
             uint16_t val = (uint16_t)(raw[2*i] | (raw[2*i+1] << 8));
-            average_spectrum[i] = average_spectrum[i] + val / scans_average;
+            average_spectrum[i] = average_spectrum[i] + val * denominator;
         }
 
         nb_coadded_spectrum++;
